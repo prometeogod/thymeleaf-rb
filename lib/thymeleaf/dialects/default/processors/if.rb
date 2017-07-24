@@ -10,5 +10,6 @@ class IfProcessor
       node.children.each {|child| child.unlink }
       node.unlink
     end
+  
   end
 end

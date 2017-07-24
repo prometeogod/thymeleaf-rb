@@ -7,6 +7,7 @@ class FragmentProcessor
     context.root.set_private DefaultDialect::context_fragment_var(fragment_name), node
 
     attribute.unlink
+
   end
 
 end

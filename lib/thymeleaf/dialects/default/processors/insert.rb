@@ -9,7 +9,6 @@ class InsertProcessor
     attribute.unlink
 
     template, fragment = FragmentExpression.parse(context, attribute.value)
-    
     node_subcontent = get_node_template(template, node, context)
 
     node.children.each {|child| child.unlink }
