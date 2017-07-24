@@ -1,0 +1,93 @@
+class NodeTree
+  attr_accessor :name, :attributes, :children, :parent
+
+  def initialize(name, attributes={}, children=[], parent=nil)
+    self.name=name
+    self.attributes=attributes
+    self.children= children
+   	self.parent=parent
+  end
+
+  def add_child(node)
+  	self.children.push(node)
+  	node.parent=self
+  end
+
+  def add_next_sibling(node)
+    parent=self.parent
+    index=parent.children.index(self)
+    parent.children.insert(index+1,node)
+    node.parent=parent
+  end
+
+  def add_previous_sibling(node)
+  	parent=self.parent
+    index=parent.children.index(self)
+    parent.children.insert(index,node)
+    node.parent=parent
+  end
+
+  def replace(other)
+    parent=self.parent
+    index=parent.children.index(self)
+    parent.children.delete_at(index)
+    other.parent=parent
+    parent.children.insert(index,other)
+  end
+
+  def to_html
+    string=''
+    if self.name == 'text-content'
+      string+= self.attributes
+      string+=to_html_child(self.children) if !self.children.empty?
+    else
+      string+= ('<'+self.name.gsub(/\s*-codename\d*/,'')+ to_s_attributes(self.attributes) +'>')
+      string+=to_html_child(self.children) if !self.children.empty?
+      string+= ('</' + self.name.gsub(/\s*-codename\d*/,'') +'>')
+    end
+  end
+
+  def hard_copy
+    new_node = NodeTree.new(self.name)
+    if self.name=='text-content'
+      new_node.attributes=self.attributes if !self.attributes.empty?
+    else
+      new_node.attributes=copy_attributes(self.attributes) if !self.attributes.empty?
+    end
+    self.children.each do |child|
+      new_child=child.hard_copy
+      new_node.add_child(new_child)
+    end
+    
+    new_node
+  end
+
+  private
+  def to_html_child(nodes ,string='')
+    nodes.each do |node|
+        if node.name == 'text-content'
+          string+= node.attributes
+          string+=to_html_child(node.children) if !node.children.empty?
+        else
+          string+= ('<'+node.name.gsub(/\s*-codename\d*/,'')+ to_s_attributes(node.attributes) +'>')
+          string+=to_html_child(node.children) if !node.children.empty?
+          string+= ('</' + node.name.gsub(/\s*-codename\d*/,'') +'>')
+        end
+      end
+      string
+  end
+
+  def to_s_attributes(attributes)
+    string = ''
+    attributes.each do |key, value|
+      string += (' '+key.to_s + '=' +'"' +value +'"'+' ') 
+    end
+    string
+  end
+
+  def copy_attributes(attributes)
+    new_attributes={}
+    attributes.each{|key,value| new_attributes.store(key,value)}
+    new_attributes
+  end
+end

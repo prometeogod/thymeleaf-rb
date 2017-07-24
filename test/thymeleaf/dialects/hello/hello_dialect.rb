@@ -15,9 +15,15 @@ class ExampleDialect < Dialect
   
   class HelloProcessor
     include Thymeleaf::Processor
+    #def call(node:nil, attribute:nil, **_)
+    #  node.content = 'Hello'
+    #  attribute.unlink
+    #end
     def call(node:nil, attribute:nil, **_)
-      node.content = 'Hello'
-      attribute.unlink
-      end
+      node.attributes.delete('data-say-hello')
+      node.children.clear
+      content = NodeTree.new('text-content','Hello')
+      node.add_child(content)
+    end
   end
 end

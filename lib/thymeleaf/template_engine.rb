@@ -9,11 +9,12 @@ module Thymeleaf
 
   private
     def process_node(context_holder, node)
-      attr_context = process_attributes(context_holder, node)
-      children_context = process_tag(attr_context, node)
       
-      # TODO: Processing all nodes. Maybe filtering by only-thymeleaf nodes can give better performance?
-      node.children.each {|child| process_node(children_context, child)}
+        attr_context = process_attributes(context_holder, node)
+        
+        children_context = process_tag(attr_context, node)
+  
+        node.children.each {|child| process_node(children_context, child)}
     end
 
     def process_attributes(context_holder, node)
@@ -30,14 +31,12 @@ module Thymeleaf
       # TODO: Find all proccessors. Apply in precedence order!
       dialects = Thymeleaf.configuration.dialects
       key, processor = * dialects.find_attr_processor(attribute_key)
-      
       process_element(context_holder, node, attribute, key, processor)
     end
     
     def process_tag(context_holder, node)
       dialects = Thymeleaf.configuration.dialects
       key, processor = * dialects.find_tag_processor(node.name)
-
       process_element(context_holder, node, nil, key, processor)
     end
     

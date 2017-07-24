@@ -20,9 +20,10 @@ module Thymeleaf
   
   private
     def do_render(template)
-      parsed_template = Parser.new(template).call
+      parsed_template = ParserSax.new(template).call
       context_holder = ContextHolder.new(context)
-      TemplateEngine.new.call(parsed_template, context_holder).to_s
+      TemplateEngineSax.new.call(parsed_template.nodes, context_holder)
+      parsed_template.to_html
     end
     
     def template_file_open(template_file)

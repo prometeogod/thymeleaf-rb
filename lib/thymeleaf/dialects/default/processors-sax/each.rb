@@ -1,21 +1,20 @@
-class EachProcessor
+class EachProcessorSax
   
   include Thymeleaf::Processor
   require_relative '../parsers/each'
 
   def call(node:nil, attribute:nil, context:nil, list:nil, **_)
-    variable, stat, enumerable = EachExpression.parse(context, attribute.value)
-    
+    variable, stat, enumerable = EachExpression.parse(context, attribute)
+
     elements = evaluate_in_context(context, enumerable)
     
     stat_var = init_stat_var(stat, elements)
-  
-    attribute.unlink
     
+    node.attributes.delete('data-th-each')
     elements.each do |element|
+      
       subcontext_vars = {}
       subcontext_vars[variable] = element unless variable.nil?
-
       unless stat.nil?
         stat_var[:index]  += 1
         stat_var[:count]  += 1
@@ -26,21 +25,19 @@ class EachProcessor
         stat_var[:last]    = (stat_var[:count].eql? stat_var[:size])
 
         subcontext_vars[stat] = stat_var
-        
       end
+      puts subcontext_vars
       subcontext = ContextHolder.new(subcontext_vars, context)
-      new_node = node.dup
-      
-      subprocess_node(subcontext, new_node)
-      
+      new_node = node.hard_copy
+      subprocess_node(subcontext, new_node,list)
       node.add_previous_sibling(new_node)
     end
-
-    node.children.each {|child| child.unlink }
-    node.unlink
     
-    context # TODO: Remove
-  
+    
+    node.children.each {|child| node.children.delete(child)}
+    list.delete(node)
+    puts node.parent.to_html
+    context
   end
   
   def has_subcontext?
@@ -65,5 +62,5 @@ private
       }
     end
   end
-  
+
 end

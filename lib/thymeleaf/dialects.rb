@@ -28,7 +28,8 @@ module Thymeleaf
     end
 
     def find_tag_processor(key)
-      find_processor key, dialect_tag_matchers, registered_tag_processors
+        new_key = key.gsub(/\s*-codename\d*/,'')
+        find_processor new_key, dialect_tag_matchers, registered_tag_processors
     end
 
   private
@@ -73,7 +74,6 @@ module Thymeleaf
     
     def find_processor(key, dialect_matchers, processor_list)
       match = dialect_matchers.match(key)
-
       # TODO: check performance null object vs null check
       return [key, null_processor] if match.nil?
 
