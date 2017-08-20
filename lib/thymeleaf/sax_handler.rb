@@ -15,7 +15,7 @@ class SaxHandler
       else
         @element_count[name] = 1
       end
-      name_node = name+'-codename'+@element_count[name].to_s
+      name_node = name
       node = NodeTree.new(name_node,attrs)
       parent=@names.last
       if !parent.nil?
@@ -51,9 +51,9 @@ class SaxHandler
           string+= node.attributes
           string+=to_html(node.children) if !node.children.empty?
         else
-          string+= ('<'+node.name.gsub(/\s*-codename\d*/,'')+ to_s_attributes(node.attributes) +'>')
+          string+= ('<'+ node.name + to_s_attributes(node.attributes) + '>')
           string+=to_html(node.children) if !node.children.empty?
-          string+= ('</' + node.name.gsub(/\s*-codename\d*/,'') +'>')
+          string+= ('</' + node.name + '>')
         end
       end
       string

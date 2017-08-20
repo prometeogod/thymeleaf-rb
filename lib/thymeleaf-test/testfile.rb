@@ -17,6 +17,9 @@ module ThymeleafTest
       @file = file
     end
 
+    def test_path
+      file
+    end
     def has_context?
       !parts.get_context.nil?
     end
@@ -66,6 +69,12 @@ module ThymeleafTest
       end
     end
 
+    def render_test
+      test_name = self.test_name
+      th_template = self.th_template
+      context = self.context
+      Thymeleaf::Template.new(th_template, context).render(test_name)
+    end
 
   private
 
@@ -89,6 +98,10 @@ module ThymeleafTest
       end
     end
 
+    def atime 
+      @file = File.open @file 
+      puts @file.atime
+    end
     def uniqueid
       now_f = Time.now.to_f
       now_i = now_f.to_s.delete('.').to_i

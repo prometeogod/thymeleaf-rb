@@ -62,7 +62,40 @@ class NodeTree
     new_node
   end
 
+  def to_string_cache(i=0,array_parent=[],array_string=[],array_nodes=[])
+    i+=1
+    array_string=to_string_cache_node(i,array_parent,array_string)
+    array_parent.delete_at(0)
+    array_nodes.delete(array_nodes.first)
+    self.children.each do |child|
+      array_parent << i
+      array_nodes << child
+    end
+    array_nodes.each do |node|
+      node.to_string_cache(i,array_parent,array_string,array_nodes)
+    end
+    array_string
+  end
+
   private
+  
+  def to_string_cache_node(i,array_parent,array_string)
+    string=(i).to_s+';'
+    string+=(self.name)+';'
+    if self.name == 'text-content'
+      string+= self.attributes+';'
+    else
+      string+= to_s_attributes_cache(self.attributes)+';'
+    end
+    if array_parent.empty?
+      string+=0.to_s
+    else
+      string+=array_parent.first.to_s
+    end
+    array_string << string
+    array_string
+  end
+
   def to_html_child(nodes ,string='')
     nodes.each do |node|
         if node.name == 'text-content'
@@ -77,6 +110,13 @@ class NodeTree
       string
   end
 
+  def to_s_attributes_cache(attributes)
+    string = ''
+    attributes.each do |key, value|
+      string += string += (''+key.to_s + '=' +'"' +value +'"'+',') 
+    end
+    string
+  end
   def to_s_attributes(attributes)
     string = ''
     attributes.each do |key, value|
