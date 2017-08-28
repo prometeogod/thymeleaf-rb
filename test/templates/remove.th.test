@@ -56,7 +56,7 @@
     
     <h1>My incredible shopping list #1</h1>
     <ul class="list list-body"></ul>
-    <h1 data-th-text="My incredible shopping list #2">Another shopping list</h1>
+    <h1>My incredible shopping list #2</h1>
     
         <div>Eggs</div>
         <div>Bread</div>

@@ -17,6 +17,7 @@ ThymeleafTest::TestDir::find_erb do |testfile|
 
   TestRenderThymeleaf.add_test test_name do
     assert_html_page(testfile.expected_fragment, testfile.th_template, testfile.context)
+    #assert_html(testfile.expected_fragment, testfile.th_template, testfile.context)
   end
 
 end
