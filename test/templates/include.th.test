@@ -40,24 +40,24 @@
 </article>
 ---
 <article>
-    <header data-th-fragment="myfragment">This is my fragment</header>
+    <header>This is my fragment</header>
     <header id="another-fragment">This is another fragment</header>
     
     <p>A short description</p>
-    <!-- Including external file -->
+    
     <div><div id="content-included">
     <h2>Included title</h2>
     <p>Included content!</p>
 </div></div>
-    <!-- Own page fragment -->
+    
     <div><header>This is my fragment</header></div>
-    <!-- Same as previous, short form -->
+    
     <div><header>This is my fragment</header></div>
-    <!-- Invalid "this" replacement -->
+    
     <div></div>
-    <!-- Selecting a specific part of external page -->
+    
     <div><p>Included content!</p></div>
-    <!-- DOM Replacement -->
+    
     <div><header id="another-fragment">This is another fragment</header></div>
 </article>
 ---

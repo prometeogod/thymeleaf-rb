@@ -47,18 +47,20 @@ class NodeTree
     end
   end
 
+  def deep_clone
+    Marshal::load(Marshal::dump(self))
+  end
   def hard_copy
     new_node = NodeTree.new(self.name)
     if self.name=='text-content'
-      new_node.attributes=self.attributes if !self.attributes.empty?
+      new_node.attributes=self.attributes
     else
-      new_node.attributes=copy_attributes(self.attributes) if !self.attributes.empty?
+      new_node.attributes=copy_attributes(self.attributes)
     end
     self.children.each do |child|
       new_child=child.hard_copy
       new_node.add_child(new_child)
     end
-    
     new_node
   end
 
@@ -113,14 +115,14 @@ class NodeTree
   def to_s_attributes_cache(attributes)
     string = ''
     attributes.each do |key, value|
-      string += string += (''+key.to_s + '=' +'"' +value +'"'+',') 
+      string += string += (''+key.to_s + '=' +'"' +value +'"'+'/,') 
     end
     string
   end
   def to_s_attributes(attributes)
     string = ''
     attributes.each do |key, value|
-      string += (' '+key.to_s + '=' +'"' +value +'"'+' ') 
+      string += (' '+key.to_s + '=' +'"' +value +'"') 
     end
     string
   end

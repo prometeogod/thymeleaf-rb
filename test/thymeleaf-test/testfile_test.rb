@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require_relative 'thymeleaftest_test'
+require 'thymeleaf'
 require 'thymeleaf-test'
 
 # TODO: MiniTest Spec
@@ -83,5 +84,16 @@ class TestFileLibTest < TestThymeleafTestLib
 
   end
 
+  def test_testfile_render_test
+    Thymeleaf.configure do |config|
+      config.template.prefix = "test/templates/"
+      config.template.suffix = '.th.html'
+    end
+    ThymeleafTest::TestDir::find("test/templates/**") do |file|
+      if file != '.' && file != '..'
+          assert_equal file.render_test, file.expected_fragment
+      end
+    end
+  end
 
 end

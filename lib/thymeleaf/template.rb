@@ -28,7 +28,7 @@ module Thymeleaf
           handler = ParserSax.new(template).call
           parsed_template=handler.nodes
           Thymeleaf.configuration.cache_manager.parsed_cache.set(cache_name,parsed_template)
-          #Thymeleaf.configuration.cache_manager.
+          Thymeleaf.configuration.cache_manager.write_file_cache(parsed_template,filename)# TODO realizar la escritura en memoria en otro momento
         end
       else
         handler = ParserSax.new(template).call

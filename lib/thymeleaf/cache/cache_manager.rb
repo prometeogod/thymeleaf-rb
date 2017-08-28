@@ -14,18 +14,19 @@ class CacheManager
   # Read memory and creates a parsed templates cache
   def mem2parsed_cache(folder, cache)
   	Dir.foreach(folder) do |file| 
-	  if (file != ".") && (file != "..")
-		array=read_from_file(folder+"/"+file)
-		node_list=to_nodetree_list(array)
-		cache.set(file,node_list)
+	    if (file != ".") && (file != "..")
+		    array=read_from_file(folder+"/"+file)
+		    node_list=to_nodetree_list(array)
+		    cache.set(file,node_list)
+	    end
 	  end
-	end
   end
 
   
   def write_file_cache(node_list,filename)
     file_suffix = '.th.parsed_cache'
-    file = filename+file_suffix
+    file_preffix = 'lib/thymeleaf/cache/parsed_cache/'
+    file = file_preffix+filename+file_suffix
     File.open(file,'w+') do |file|
   	  node_list.each do |node|
   	    string_cache=node.to_string_cache
@@ -60,7 +61,7 @@ class CacheManager
       array_cache = array[j]
       while i < array_cache.length
   	    if array_cache[i].split(';').length == 2
-          array_cache[i-1] << "\r"<< array_cache[i]
+          array_cache[i-1] << ""<< array_cache[i]
           array_cache.delete_at(i)
  	    else
  	      i+=1
@@ -115,7 +116,7 @@ class CacheManager
   # Returns attributes from a string. To nodes non text-content
   def to_attributes(attributes_string)
 	attributes={}
-	array_attributes = attributes_string.split(',')
+	array_attributes = attributes_string.split('/,')
 	array_attributes.each do |string|
 	  pair = string.split('=')
 	  value = pair[1]

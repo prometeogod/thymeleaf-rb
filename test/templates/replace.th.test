@@ -44,20 +44,20 @@
     <header id="another-fragment">This is another fragment</header>
     
     <p>A short description</p>
-    <!-- Including external file -->
+    
     <div id="content-included">
     <h2>Included title</h2>
     <p>Included content!</p>
 </div>
-    <!-- Own page fragment -->
+    
     <header>This is my fragment</header>
-    <!-- Same as previous, short form -->
+    
     <header>This is my fragment</header>
-    <!-- Invalid replacement -->
+    
     <div></div>
-    <!-- Selecting a specific part of external page -->
+    
     <p>Included content!</p>
-    <!-- DOM Replacement -->
+    
     <header id="another-fragment">This is another fragment</header>
 </article>
 ---
