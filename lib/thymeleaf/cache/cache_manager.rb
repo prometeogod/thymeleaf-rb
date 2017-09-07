@@ -1,5 +1,6 @@
 require_relative '../nodetree'
 require_relative 'cache'
+require_relative 'nodeValueDate'
 class CacheManager
   
   attr_accessor :parsed_cache
@@ -15,19 +16,22 @@ class CacheManager
   def mem2parsed_cache(folder, cache)
   	Dir.foreach(folder) do |file| 
 	    if (file != ".") && (file != "..")
-		    array=read_from_file(folder+"/"+file)
+		    array,time=read_from_file(folder+"/"+file)
 		    node_list=to_nodetree_list(array)
-		    cache.set(file,node_list)
+        nodevd=NodeValueDate.new(node_list,time)
+		    cache.set(file,nodevd)
 	    end
 	  end
   end
 
-  
-  def write_file_cache(node_list,filename)
+  # Write cache value and time to memory  creating a file.th.parsed_cache file
+  def write_file_cache(node_list,filename,time)
     file_suffix = '.th.parsed_cache'
     file_preffix = 'lib/thymeleaf/cache/parsed_cache/'
     file = file_preffix+filename+file_suffix
     File.open(file,'w+') do |file|
+      file.puts 'Time:'+time.to_s
+      file.puts '****'
   	  node_list.each do |node|
   	    string_cache=node.to_string_cache
   	    string_cache.each do |string|
@@ -39,21 +43,27 @@ class CacheManager
   end
 
   # Reads a file and creates an indexed array with this format : index;name;attributes;parent_index
+  # Also returns the date saved in the cache file
   def read_from_file(filename)
     file_suffix = '.th.parsed_cache'
     array=[]
-    i=0
+    i=j=0
     array[i]=[]
+    string_date = ''
     File.open(filename,'r') do |file|
-  	  while linea = file.gets
-  	  	if linea.to_s == "****\n"
-  	  		i+=1
-  	  		array[i]=[]
-  	    else
-  	      array[i] << linea
-  	    end
-  	  end
+      while linea = file.gets
+        if (j==0)
+          string_date = linea
+        elsif linea.to_s == "****\n"
+          i+=1
+          array[i]=[]
+        else
+          array[i] << linea
+        end
+        j+=1
+      end
     end
+    time = get_time(string_date)
     array.delete(array.last)
     j=0
     while j < array.length
@@ -69,7 +79,7 @@ class CacheManager
       end
       j+=1
     end
-    array
+    [array,time]
   end
 
   # Returns a list of Nodetree from an array
@@ -126,5 +136,11 @@ class CacheManager
 	attributes
   end
 
-
+  def get_time(string_date)
+    require 'time'
+    array= string_date.split(/Time:/)
+    date = array[1].chop!
+    time = Time.parse(date)
+  end
+  
 end

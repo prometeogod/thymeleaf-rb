@@ -1,5 +1,6 @@
 require 'test_helper'
 require 'thymeleaf/cache/cache'
+require 'thymeleaf/cache/nodeValueDate'
 
 describe Cache do 
 	before(:each) do 
@@ -44,5 +45,14 @@ describe Cache do
 		@cache.set(2,2)
 		a = @cache.to_a
 		assert_equal a.kind_of?(Array) , true
+	end
+	
+	it 'should insert a nodeValueDate in a cache object' do
+	  date = Time.new(2000,1,1)
+	  date1 = Time.new(2000,1,2)
+	  node = NodeValueDate.new('value',date)
+	  @cache.set('keyValueDate',node)
+	  assert_equal @cache.get('keyValueDate').date , date
+	  assert_equal @cache.get('keyValueDate').value , 'value'
 	end
 end
