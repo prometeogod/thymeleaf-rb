@@ -9,3 +9,6 @@ projectFilesBackup/
 
 # Ignore benchmark results
 benchmarks/results/
+
+# Ignore cache files
+lib/thymeleaf/cache/parsed_cache/

@@ -73,7 +73,11 @@ module ThymeleafTest
       test_name = self.test_name
       th_template = self.th_template
       context = self.context
-      Thymeleaf::Template.new(th_template, context).render(test_name)
+      Thymeleaf::Template.new(th_template, context).render(test_path)
+    end
+
+    def test_last_modified
+      File.ctime(file)
     end
 
   private

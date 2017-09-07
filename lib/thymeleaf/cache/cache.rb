@@ -2,7 +2,7 @@ class Cache
 
 	attr_reader :count, :limit
 
-	Node = Struct.new(:key, :value)
+	Node = Struct.new(:key ,:value)
 
 	def initialize(limit=nil)
 	  @data = {}
