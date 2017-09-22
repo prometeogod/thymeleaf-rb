@@ -79,6 +79,36 @@ class NodeTree
     array_string
   end
 
+  def to_array_fragment(count=0,parent=0,array_cache=[])
+    count+=1
+    parent+=1
+    array_cache << to_string_array_line(count,self.name,self.attributes,0);
+    count,array=to_array_fragment_child(self.children,count,parent,[])
+    array_cache= array_cache+array
+    array_cache
+  end
+
+  def to_array_fragment_child(node_list,count,parent,array)
+    count+=1
+    node_list.each do |node|
+      array << to_string_array_line(count,node.name,node.attributes,parent)
+      count,array=to_array_fragment_child(node.children,count,count,array) if !node.children.nil?
+    end
+    [count,array]
+  end
+  def to_string_array_line(i,name,attributes,parent)
+    separator='&sep'
+    string=(i).to_s+separator
+    string+=(name.to_s)+separator
+    if name.to_s == 'text-content'
+      string+= attributes.to_s+separator
+    else
+      string+= to_s_attributes_cache(attributes)+separator
+    end
+    string+=parent.to_s
+    string
+  end
+
   private
   
   def to_string_cache_node(i,array_parent,array_string)
