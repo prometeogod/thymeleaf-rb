@@ -35,6 +35,7 @@ class CacheManager
   end
   # Read memory and creates a parsed templates cache
   def mem2parsed_cache(folder, cache)
+    Dir.mkdir(folder, 0700)  if !Dir.exist?(folder)
   	Dir.foreach(folder) do |file| 
 	    if (file != ".") && (file != "..")
 		    array,time=read_from_file(folder+"/"+file)
@@ -46,6 +47,7 @@ class CacheManager
   end
 
   def mem2fragment_cache(folder,cache)
+    Dir.mkdir(folder, 0700)  if !Dir.exist?(folder)
     Dir.foreach(folder) do |file|
       if (file != ".")&& (file != "..")
         array_cache = read_fragment_file(folder+"/"+file)
