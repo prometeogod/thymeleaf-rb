@@ -2,11 +2,11 @@ class NodeValueDate
   attr_accessor :value, :date 
 
   def initialize(value,date=nil)
-  	@value = value
+  	self.value = value
   	if (date != nil)
- 	  @date = date
+ 	  self.date = date
  	else
- 	  @date = Time.now
+ 	  self.date = Time.now
  	end
   end
 end
