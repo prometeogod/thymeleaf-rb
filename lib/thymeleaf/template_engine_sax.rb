@@ -1,19 +1,22 @@
+require_relative './utils/randomStringGenerator'
+require 'json'
+
 module Thymeleaf
   class TemplateEngineSax
   	
   	def call(handler_nodes, context_holder)
   	  handler_nodes.each do |node|
-        cache_key = get_cache_key(context_holder,node)#This operation is expensive in time
-        if Thymeleaf.configuration.cache_manager.fragment_cache.get(cache_key).nil?
-          filename = to_filename(cache_key,cache_key.length/10)#This operation is expensive in time
+        key = get_cache_key(context_holder,node)# Cuidado con esta operacion
+        if Thymeleaf.configuration.cache_manager.fragment_cache.get(key).nil?
+          filename = RandomStringGenerator.new.random
           if node.name != 'text-content'
             process_node(context_holder,node,handler_nodes)
           end
-          Thymeleaf.configuration.cache_manager.fragment_cache.set(cache_key,node)
-          Thymeleaf.configuration.cache_manager.write_file_fragment(node,cache_key,filename)#TODO Do the write in an exit event
+          Thymeleaf.configuration.cache_manager.fragment_cache.set(key,node)
+          Thymeleaf.configuration.cache_manager.write_file_fragment(node,key,filename)#TODO Do the write in an exit event
           
         else
-          new_node=Thymeleaf.configuration.cache_manager.fragment_cache.get(cache_key)
+          new_node=Thymeleaf.configuration.cache_manager.fragment_cache.get(key)
           ind = handler_nodes.index(node)
           handler_nodes.delete_at(ind)
           handler_nodes.insert(ind,new_node)
@@ -75,42 +78,12 @@ module Thymeleaf
       processor.respond_to?(:has_subcontext?) && processor.has_subcontext?
 	  end
 
-    def get_cache_key(context_holder, node)
-      context_string = context_holder.to_s
-      node_string = node.to_html
-      if node_string.nil?
-        cache_key=context_string
-      else
-        cache_key=context_string + node_string
-      end
-      cache_key
+    # El determinado de la clave es esencial para que sea más rápido
+    def get_cache_key(context_holder,node)
+      hash={ 
+        :node =>node,
+        :context_holder => context_holder
+      }
     end
-     
-      
-    
-    def to_filename(cache_key,jump)
-      name=cache_key
-      len=name.length
-      if (jump!=0)
-        num=len/jump
-        i=0
-        str=''
-        while i<num+1
-          if (i*jump+(jump-1))<len
-            str1=name[i*jump..i*jump+(jump-1)]
-          else
-            str1=name[i*jump..len]
-          end
-          str+=str1.crypt("aa")
-          i+=1
-        end
-        str=str.gsub(/[\/.]/, '_')
-      else
-        str=name.crypt("aa")
-        str=str.gsub(/[\/.]/, '_')
-      end
-      str
-    end
-
   end
 end
