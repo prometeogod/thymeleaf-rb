@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'awesome_print'
   spec.add_development_dependency 'benchmark-ips', '~> 2.6'
+  spec.add_development_dependency 'benchmark-memory','~> 0.1'
   spec.add_development_dependency 'webrick'
   spec.add_development_dependency 'json'
 end

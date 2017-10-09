@@ -4,23 +4,16 @@ require_relative 'nodeValueDate'
 require_relative '../utils/jsonToNodetreeConverter'
 require 'json'
 require 'time'
+require 'fileutils'
 class CacheManager
   
   attr_accessor :parsed_cache , :fragment_cache
 
   def clear_caches
     folder='lib/thymeleaf/cache/parsed_cache/'
-    Dir.foreach(folder) do |file|
-      if (file != ".")&& (file != "..")
-        File.delete(folder+file)
-      end
-    end
+    FileUtils.rm_rf Dir.glob("#{folder}/*")
     folder='lib/thymeleaf/cache/fragment_cache/'
-    Dir.foreach(folder) do |file|
-      if (file != ".")&& (file != "..")
-        File.delete(folder+file)
-      end
-    end
+    FileUtils.rm_rf Dir.glob("#{folder}/*")
   end
   
 

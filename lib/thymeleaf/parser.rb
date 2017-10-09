@@ -1,17 +1,17 @@
-
-require 'nokogiri'
+require 'oga'
+require_relative 'sax_handler'
 
 module Thymeleaf
 
   class Parser < Struct.new(:template_markup)
     def call
+      handler = SaxHandler.new
       if /^\s*(?:\s*<!--[^>]*-->)*\s*<(?:html|!doctype)/i.match(template_markup)
-        Nokogiri::HTML(template_markup, Thymeleaf.configuration.parser.encoding)
-        
+        Oga.sax_parse_html(handler,template_markup)
       else
-        Nokogiri::HTML::fragment(template_markup, Thymeleaf.configuration.parser.encoding)
-        
+        Oga.sax_parse_html(handler,template_markup)
       end
+      handler
     end
   end
 

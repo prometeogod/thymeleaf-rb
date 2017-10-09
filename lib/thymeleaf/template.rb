@@ -34,25 +34,25 @@ module Thymeleaf
           date_comparison= cache_date <=> file_date
           if (date_comparison == -1)
             Thymeleaf.configuration.cache_manager.parsed_cache.delete(cache_name)
-            handler = ParserSax.new(template).call
+            handler = Parser.new(template).call
             parsed_template=handler.nodes
             node = NodeValueDate.new(parsed_template)
             Thymeleaf.configuration.cache_manager.parsed_cache.set(cache_name,node)
             Thymeleaf.configuration.cache_manager.write_file_cache(parsed_template,name_parsed)# TODO realizar la escritura en memoria en otro momento
           end
         else # If isn't cached
-          handler = ParserSax.new(template).call
+          handler = Parser.new(template).call
           parsed_template=handler.nodes
           node = NodeValueDate.new(parsed_template)
           Thymeleaf.configuration.cache_manager.parsed_cache.set(cache_name,node)
           Thymeleaf.configuration.cache_manager.write_file_cache(parsed_template,name_parsed)# TODO realizar la escritura en memoria en otro momento
         end
       else
-        handler = ParserSax.new(template).call
+        handler = Parser.new(template).call
         parsed_template=handler.nodes
       end
       context_holder = ContextHolder.new(context)
-      TemplateEngineSax.new.call(parsed_template, context_holder)
+      TemplateEngine.new.call(parsed_template, context_holder)
       rendered=""
       parsed_template.each do |node|
         if !node.to_html.nil?

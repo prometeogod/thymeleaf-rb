@@ -11,7 +11,7 @@ module Thymeleaf
 
 
     def subprocess_node(context, node, list)
-        processor = Thymeleaf::TemplateEngineSax.new
+        processor = Thymeleaf::TemplateEngine.new
         processor.send(:process_node, context, node, list)
     end
 

@@ -1,7 +1,6 @@
 
 require_relative 'dialects'
 require_relative 'dialects/default/default_dialect'
-require_relative 'dialects/default/default_dialect_sax'
 require_relative 'template/template_resolver'
 require_relative 'parser/parse_options'
 require_relative 'cache/cache_manager'
@@ -29,7 +28,7 @@ module Thymeleaf
       self.dialects = Dialects.new
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new
-      add_dialect DefaultDialectSax  
+      add_dialect DefaultDialect  
     end
 
     def add_dialect(*args)
