@@ -1,20 +1,19 @@
 require_relative '../../../utils/booleanize'
 
 class RemoveProcessor
-
   include Thymeleaf::Processor
-  
+
   REMOVE_ALL           = 'all'
   REMOVE_BODY          = 'body'
   REMOVE_TAG           = 'tag'
   REMOVE_ALL_BUT_FIRST = 'all-but-first'
   REMOVE_NONE          = 'none'
 
-  def call(node:nil, attribute:nil, context:nil, **_)
-    attribute.unlink
+  def call(node:nil, attribute:nil, context:nil, list:nil, **_)
+    node.attributes.delete('data-th-remove')
     
-    expr = EvalExpression.parse(context, attribute.value)
-    
+    expr = EvalExpression.parse(context, attribute)
+
     method = case expr
                when REMOVE_ALL
                  :remove_all
@@ -34,52 +33,51 @@ class RemoveProcessor
                  end
                end
     
-    send(method, node, context)
+    send(method, node, list, context)
   end
-  
-private
-  def remove_all(node, _)
-    node.children.each do |child|
-      child.unlink
-    end
-    node.unlink
+
+  private
+
+  def remove_none(_, _, _)
   end
-  
-  def remove_body(node, _)
-    node.children.each do |child|
-      child.unlink
-    end
+
+  def remove_all(node, list, _)
+  	node.children.each do |child|
+  	  node.children.delete(child)
+  	end
+  	list.delete(node)
   end
-  
-  def remove_tag(node, context)
+
+  def remove_body(node, list, _)
+  	node.children=[]
+  end
+
+  def remove_tag(node,list, context)
     node.children.reverse.each do |child|
-      subprocess_node(context, child)
+      subprocess_node(context, child, list)
       node.add_next_sibling child
     end
-    node.unlink
+    list.delete(node)
   end
-  
-  def remove_allbutfirst(node, _)
-    skip_first(node.children) do |child|
-      child.unlink
-    end
+  def remove_allbutfirst(node, list, _)
+  	first=get_first_non_empty(node.children).dup
+  	node.children.clear
+  	node.add_child(first)
   end
-  
-  def remove_none(_, _)
-  end
-  
   def empty_node?(node)
     node.to_s.strip.empty?
   end
   
-  def skip_first(node_set)
-    i = 0
+  def get_first_non_empty(node_set)
     node_set.each do |child|
-      if i > 0
-        yield child
+      if child.name=='text-content' and !empty_node?(child.attributes)
+      	return child
       else
-        i += 1 unless empty_node? child
+      	if child.name != 'text-content'
+      		return child
+      	end
       end
     end
   end
+
 end

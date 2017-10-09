@@ -1,28 +1,35 @@
-
 class InsertProcessor
-
   include Thymeleaf::Processor
   
   require_relative '../parsers/fragment'
 
+    require_relative '../parsers/fragment'
+
   def call(node:nil, attribute:nil, context:nil, **_)
-    attribute.unlink
-
-    template, fragment = FragmentExpression.parse(context, attribute.value)
-    node_subcontent = get_node_template(template, node, context)
-
-    node.children.each {|child| child.unlink }
+    node.attributes.delete('data-th-insert')
     
+    
+    template, fragment = FragmentExpression.parse(context, attribute)
+    node_subcontent = get_node_template(template, node, context)
+    node.children=[]
     if fragment.nil?
-      # Avoid infinite loop when template is "this" and fragment is nil
+      #Avoid infinite loop when template is "this" and fragment is nil
       return nil if is_self_template? template
     else
       node_subcontent = get_fragment_node(fragment, context, node_subcontent)
+      node.add_child(node_subcontent)
+    end
+    
+    unless node_subcontent.nil?
+      if node_subcontent.kind_of?(Array)
+        node_subcontent.each do |sub|
+          node.add_child(sub)
+        end
+      else
+        node_subcontent.dup.parent = node
+      end
     end
 
-    unless node_subcontent.nil?
-      node_subcontent.dup.parent = node
-    end
   end
 
 
@@ -33,9 +40,8 @@ private
       root_node node
     else
       subtemplate = EvalExpression.parse(context, template)
-
       load_template subtemplate do |template_file|
-        Thymeleaf::Parser.new(template_file).call
+        Thymeleaf::Parser.new(template_file).call.nodes
       end
     end
   end
@@ -58,7 +64,29 @@ private
     if root_context.has_private DefaultDialect::context_fragment_var(fragment_name)
       root_context.get_private DefaultDialect::context_fragment_var(fragment_name)
     else
-      node.at_css fragment_name
+      fragment_name=fragment_name.delete(fragment_name[0])
+      get_DOM_replacement(fragment_name,root_node(node))
     end
+  end
+  def get_DOM_replacement(fragment_name, root)
+    root.attributes.each_pair do |key,value|
+      if key=='id' and value==fragment_name
+          return root 
+        end
+    end
+    get_fragment_DOM_replacement(fragment_name, root.children) if !root.children.empty?
+  end
+  def get_fragment_DOM_replacement(fragment_name, template)
+    template.each do |node|
+      if node.name != 'text-content'
+        node.attributes.each do |key, value|
+          if key=='id' and value==fragment_name
+            return node 
+          end
+        end
+        get_fragment_DOM_replacement(fragment_name,node.children) if !node.children.empty?
+      end
+    end
+    return nil
   end
 end
