@@ -1,11 +1,14 @@
 #!/usr/bin/env ruby
 
 require_relative '../lib/thymeleaf-test'
+require_relative '../compare/thymeleaf-Noko/thymeleaf-Noko'
 require_relative 'suite'
 require_relative 'test_runners/erb'
 require_relative 'test_runners/th'
+require_relative 'test_runners/th-Noko'
 
 require 'benchmark/ips'
+require 'benchmark/memory'
 require 'awesome_print'
 require 'fileutils'
 
@@ -13,7 +16,12 @@ Thymeleaf.configure do |config|
   config.template.prefix = "#{__dir__}/../test/templates/"
   config.template.suffix = '.th.html'
 end
-
+# Thymeleaf Nokogiri configuration to compare
+ThymeleafNoko.configure do |config|
+  config.template.prefix = "#{__dir__}/../test/templates/"
+  config.template.suffix = '.th.html'
+end
+#########################################################
 ap "[PERF] -----------------------------"
 
 ThymeleafTest::TestDir::find_erb do |testfile|
@@ -39,4 +47,9 @@ ThymeleafTest::TestDir::find_erb do |testfile|
     
   end
 
+  Benchmark.memory do |x|
+    x.report("thymeleaf.rb") { ThTestRunner::render(testfile)  }
+    x.report("thymeleaf-Nokogiri") { ThNokoTestRunner::render(testfile)  }
+    x.compare!
+  end
 end
