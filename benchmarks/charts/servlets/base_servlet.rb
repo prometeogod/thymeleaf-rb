@@ -1,5 +1,6 @@
 
-require_relative '../../../lib/thymeleaf'
+#require_relative '../../../lib/thymeleaf' #Use this
+require_relative '../../../compare/thymeleaf-Noko/thymeleaf-Noko' #TODO Remove  
 
 
 class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
@@ -24,7 +25,8 @@ class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
   end
   
   def render_template(template, context)
-    Thymeleaf::Template.new(template, context).render.to_s
+    #Thymeleaf::Template.new(template, context).render.to_s #TODO Use this
+    ThymeleafNoko::Template.new(template, context).render.to_s #TODO Remove
   end
 
 end
