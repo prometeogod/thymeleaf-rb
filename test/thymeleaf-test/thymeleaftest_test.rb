@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
-require 'thymeleaf-test'
+require 'thymeleaf_test'
 
 class TestThymeleafTestLib < Minitest::Test
 

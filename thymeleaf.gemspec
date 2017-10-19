@@ -1,6 +1,7 @@
-# coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
+
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 require 'thymeleaf/version'
 
 Gem::Specification.new do |spec|
@@ -26,8 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'minitest'
   spec.add_development_dependency 'awesome_print'
   spec.add_development_dependency 'benchmark-ips', '~> 2.6'
-  spec.add_development_dependency 'benchmark-memory','~> 0.1'
+  spec.add_development_dependency 'benchmark-memory', '~> 0.1'
   spec.add_development_dependency 'webrick'
   spec.add_development_dependency 'json'
 end
-

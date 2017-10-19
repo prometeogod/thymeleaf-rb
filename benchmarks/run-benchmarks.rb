@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative '../lib/thymeleaf-test'
+require_relative '../lib/thymeleaf_test'
 require_relative '../compare/thymeleaf-Noko/thymeleaf-Noko'
 require_relative 'suite'
 require_relative 'test_runners/erb'

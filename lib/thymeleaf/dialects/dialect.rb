@@ -1,6 +1,5 @@
-
+# Dialect class definition: it defines the dialect processors
 class Dialect
-
   def self.default_key
     nil
   end
@@ -14,5 +13,4 @@ class Dialect
   def processors
     {}
   end
-
 end

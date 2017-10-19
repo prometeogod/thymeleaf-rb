@@ -2,7 +2,7 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require_relative 'thymeleaftest_test'
 require 'thymeleaf'
-require 'thymeleaf-test'
+require 'thymeleaf_test'
 
 # TODO: MiniTest Spec
 class TestFileLibTest < TestThymeleafTestLib
@@ -12,7 +12,7 @@ class TestFileLibTest < TestThymeleafTestLib
     testfile = ThymeleafTest::TestFile.new file
     assert testfile.is_a? ThymeleafTest::TestFile
 
-    assert testfile.has_context?
+    assert testfile.context?
     assert_equal testfile.context, eval(TEST_DEFAULT_CONTEXT)
   end
 
@@ -21,13 +21,13 @@ class TestFileLibTest < TestThymeleafTestLib
     testfile = ThymeleafTest::TestFile.new file
     assert testfile.is_a? ThymeleafTest::TestFile
 
-    assert testfile.has_context?
+    assert testfile.context?
     assert_equal testfile.context, eval(TEST_DEFAULT_CONTEXT)
   end
 
   def test_testfile_content
     ThymeleafTest::TestDir::find("**", TEST_FILETYPE) do |testfile|
-      assert testfile.has_context?
+      assert testfile.context?
       assert_equal testfile.context, eval(TEST_DEFAULT_CONTEXT)
     end
   end
@@ -36,16 +36,16 @@ class TestFileLibTest < TestThymeleafTestLib
     file = load_filetest "no_th"
     testfile = ThymeleafTest::TestFile.new file
 
-    assert testfile.has_context?
+    assert testfile.context?
     assert_equal testfile.context, eval(TEST_DEFAULT_CONTEXT)
 
-    refute testfile.has_th?
+    refute testfile.th?
     assert_nil testfile.th_template
 
-    refute testfile.has_erb?
+    refute testfile.erb?
     assert_nil testfile.erb_template
 
-    refute testfile.has_expected?
+    refute testfile.expected?
     assert_nil testfile.expected_fragment
   end
 
@@ -53,16 +53,16 @@ class TestFileLibTest < TestThymeleafTestLib
     file = load_filetest "no_erb"
     testfile = ThymeleafTest::TestFile.new file
 
-    assert testfile.has_context?
+    assert testfile.context?
     assert_equal testfile.context, eval(TEST_DEFAULT_CONTEXT)
 
-    assert testfile.has_th?
+    assert testfile.th?
     assert_equal testfile.th_template, TEST_DEFAULT_TH
 
-    refute testfile.has_erb?
+    refute testfile.erb?
     assert_nil testfile.erb_template
 
-    assert testfile.has_expected?
+    assert testfile.expected?
     assert_equal testfile.expected_fragment, TEST_DEFAULT_EXPECTED
   end
 

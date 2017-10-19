@@ -1,8 +1,7 @@
-
+# Thymeleaf module
 module Thymeleaf
-
+  # Dialects class definition
   class Dialects
-
     def initialize
       clear_dialects
     end
@@ -16,7 +15,7 @@ module Thymeleaf
       registered_attr_processors[key] = dialect_processors(dialect)
       registered_tag_processors[key] = dialect_tag_processors(dialect)
     end
-    
+
     def clear_dialects
       self.registered_dialects        = {}
       self.registered_attr_processors = {}
@@ -28,18 +27,18 @@ module Thymeleaf
     end
 
     def find_tag_processor(key)
-        new_key = key.gsub(/\s*-codename\d*/,'')
-        find_processor new_key, dialect_tag_matchers, registered_tag_processors
+      find_processor key, dialect_tag_matchers, registered_tag_processors
     end
 
-  private
+    private
 
-    attr_accessor :registered_dialects, :registered_attr_processors, :registered_tag_processors
+    attr_accessor :registered_dialects, :registered_attr_processors
+    attr_accessor :registered_tag_processors
 
     def dialect_attr_matchers
       /^data-(#{registered_dialects.keys.join("|")})-(.*)$/
     end
-    
+
     def dialect_tag_matchers
       /^(#{registered_dialects.keys.join("|")})-(.*)$/
     end
@@ -47,10 +46,10 @@ module Thymeleaf
     def null_processor
       @null_prccesor ||= NullProcessor.new
     end
-    
+
     def expand_key_dialect(*args)
       if args.length == 1
-        [ args[0].default_key, args[0] ]
+        [args[0].default_key, args[0]]
       elsif args.length == 2
         args
       else
@@ -71,7 +70,7 @@ module Thymeleaf
         processors
       end
     end
-    
+
     def find_processor(key, dialect_matchers, processor_list)
       match = dialect_matchers.match(key)
       # TODO: check performance null object vs null check
@@ -88,5 +87,4 @@ module Thymeleaf
       [processor_key, processor]
     end
   end
-
 end
