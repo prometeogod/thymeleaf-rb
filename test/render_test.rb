@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 
 require_relative 'test_helper'
-require 'thymeleaf-test'
+require 'thymeleaf_test'
 
 class TestRenderThymeleaf < TestThymeleaf
 

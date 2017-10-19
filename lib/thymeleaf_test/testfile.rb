@@ -2,13 +2,10 @@
 require_relative 'testparts'
 
 module ThymeleafTest
-
   class WrongTestFileFormat < StandardError
   end
-
-
+  # Testfile definition for Thymeleaf.rb : used to test the template engine
   class TestFile
-
     CONTENT_SEPARATOR = /^---\n/
 
     attr_writer :test_name
@@ -20,36 +17,37 @@ module ThymeleafTest
     def test_path
       file
     end
-    def has_context?
-      !parts.get_context.nil?
+
+    def context?
+      !parts.context.nil?
     end
 
-    def has_erb?
-      !parts.get_erb.nil?
+    def erb?
+      !parts.erb.nil?
     end
 
-    def has_th?
-      !parts.get_th.nil?
+    def th?
+      !parts.th.nil?
     end
 
-    def has_expected?
-      !parts.get_expected.nil?
+    def expected?
+      !parts.expected.nil?
     end
 
     def context
-      eval(parts.get_context)
+      eval(parts.context)
     end
 
     def th_template
-      parts.get_th
+      parts.th
     end
 
     def erb_template
-      parts.get_erb
+      parts.erb
     end
 
     def expected_fragment
-      parts.get_expected
+      parts.expected
     end
 
     def test_name(add_uniqueid = false)
@@ -59,7 +57,7 @@ module ThymeleafTest
                     else
                       file.to_s.clone
                     end
-        test_name.gsub!(/[\/.]/, '_')
+        test_name.gsub!(%r{[\/.]}, '_')
         test_name
       end
       if add_uniqueid == :add_uniqueid
@@ -70,7 +68,6 @@ module ThymeleafTest
     end
 
     def render_test
-      test_name = self.test_name
       th_template = self.th_template
       context = self.context
       Thymeleaf::Template.new(th_template, context).render(test_path)
@@ -80,7 +77,7 @@ module ThymeleafTest
       File.ctime(file)
     end
 
-  private
+    private
 
     attr_accessor :file
 
@@ -94,24 +91,20 @@ module ThymeleafTest
         parts = TestParts.new content.split(CONTENT_SEPARATOR)
         @file = @file.path
 
-        unless parts.any?
-          raise WrongTestFileFormat
-        end
-
+        raise WrongTestFileFormat unless parts.any?
         parts
       end
     end
 
-    def atime 
-      @file = File.open @file 
+    def atime
+      @file = File.open @file
       puts @file.atime
     end
+
     def uniqueid
       now_f = Time.now.to_f
       now_i = now_f.to_s.delete('.').to_i
       now_i.to_s(36)
     end
-
   end
-
 end

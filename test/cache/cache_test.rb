@@ -1,6 +1,6 @@
 require 'test_helper'
 require 'thymeleaf/cache/cache'
-require 'thymeleaf/cache/nodeValueDate'
+require 'thymeleaf/cache/node_value_date'
 
 describe Cache do 
 	before(:each) do 

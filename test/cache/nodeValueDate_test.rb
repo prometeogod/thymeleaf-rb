@@ -1,5 +1,5 @@
 require 'test_helper'
-require 'thymeleaf/cache/nodeValueDate'
+require 'thymeleaf/cache/node_value_date'
 
 describe NodeValueDate do 
 	before(:each) do 

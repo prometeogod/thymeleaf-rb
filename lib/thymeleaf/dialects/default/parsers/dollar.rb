@@ -1,11 +1,9 @@
-
+# DollarExpression class definition
 class DollarExpression
-  def self.parse(context, expr, mode = nil, **args)
+  def self.parse(context, expr, mode = nil, **_args)
     expr.gsub(/(\${.+?})/) do |match|
       conv = ContextEvaluator.new(context).evaluate(match[2..-2])
-      if mode.eql? :single_expression
-        return conv
-      end
+      return conv if mode.eql? :single_expression
       conv
     end
   end

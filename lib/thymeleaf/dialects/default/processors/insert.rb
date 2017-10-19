@@ -1,42 +1,38 @@
+# InsertProcessor class definition : it process insert tags
 class InsertProcessor
   include Thymeleaf::Processor
-  
+
+  require_relative '../parsers/fragment'
   require_relative '../parsers/fragment'
 
-    require_relative '../parsers/fragment'
-
-  def call(node:nil, attribute:nil, context:nil, **_)
+  def call(node: nil, attribute: nil, context: nil, **_)
     node.attributes.delete('data-th-insert')
-    
-    
+
     template, fragment = FragmentExpression.parse(context, attribute)
     node_subcontent = get_node_template(template, node, context)
-    node.children=[]
+    node.children = []
     if fragment.nil?
-      #Avoid infinite loop when template is "this" and fragment is nil
-      return nil if is_self_template? template
+      # Avoid infinite loop when template is "this" and fragment is nil
+      return nil if self_template? template
     else
       node_subcontent = get_fragment_node(fragment, context, node_subcontent)
       node.add_child(node_subcontent)
     end
-    
-    unless node_subcontent.nil?
-      if node_subcontent.kind_of?(Array)
-        node_subcontent.each do |sub|
-          node.add_child(sub)
-        end
-      else
-        node_subcontent.dup.parent = node
-      end
-    end
 
+    return if node_subcontent.nil?
+    if node_subcontent.is_a?(Array)
+      node_subcontent.each do |sub|
+        node.add_child(sub)
+      end
+    else
+      node_subcontent.dup.parent = node
+    end
   end
 
+  private
 
-private
-  
   def get_node_template(template, node, context)
-    if is_self_template? template
+    if self_template? template
       root_node node
     else
       subtemplate = EvalExpression.parse(context, template)
@@ -45,48 +41,43 @@ private
       end
     end
   end
-  
+
   def root_node(node)
     new_node = node
-    until new_node.parent.nil?
-      new_node = new_node.parent
-    end
+    new_node = new_node.parent until new_node.parent.nil?
     new_node
   end
-  
-  def is_self_template?(template)
+
+  def self_template?(template)
     template.nil? || (template.eql? 'this')
   end
-  
+
   def get_fragment_node(fragment_name, context, node)
     root_context = context.root
-    
-    if root_context.has_private DefaultDialect::context_fragment_var(fragment_name)
-      root_context.get_private DefaultDialect::context_fragment_var(fragment_name)
+
+    if root_context.private? DefaultDialect.context_fragment_var(fragment_name)
+      root_context.get_private DefaultDialect.context_fragment_var(fragment_name)
     else
-      fragment_name=fragment_name.delete(fragment_name[0])
-      get_DOM_replacement(fragment_name,root_node(node))
+      fragment_name = fragment_name.delete(fragment_name[0])
+      get_dom_replacement(fragment_name, root_node(node))
     end
   end
-  def get_DOM_replacement(fragment_name, root)
-    root.attributes.each_pair do |key,value|
-      if key=='id' and value==fragment_name
-          return root 
-        end
+
+  def get_dom_replacement(fragment_name, root)
+    root.attributes.each_pair do |key, value|
+      return root if key == 'id' && value == fragment_name
     end
-    get_fragment_DOM_replacement(fragment_name, root.children) if !root.children.empty?
+    get_fragment_dom_replacement(fragment_name, root.children) unless root.children.empty?
   end
-  def get_fragment_DOM_replacement(fragment_name, template)
+
+  def get_fragment_dom_replacement(fragment_name, template)
     template.each do |node|
-      if node.name != 'text-content'
-        node.attributes.each do |key, value|
-          if key=='id' and value==fragment_name
-            return node 
-          end
-        end
-        get_fragment_DOM_replacement(fragment_name,node.children) if !node.children.empty?
+      next unless node.name != 'text-content'
+      node.attributes.each do |key, value|
+        return node if key == 'id' && value == fragment_name
       end
+      get_fragment_dom_replacement(fragment_name, node.children) unless node.children.empty?
     end
-    return nil
+    nil
   end
 end

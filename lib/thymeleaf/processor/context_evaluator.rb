@@ -1,4 +1,4 @@
-
+# ContextEvaluator class definition
 class ContextEvaluator
   def initialize(context)
     self.context = context
@@ -8,6 +8,7 @@ class ContextEvaluator
     context.evaluate(expr)
   end
 
-private
+  private
+
   attr_accessor :context
 end

@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__),
-                   File.expand_path('../../lib/thymeleaf-test', __FILE__)
+                   File.expand_path('../../lib/thymeleaf_test', __FILE__)
 
-require 'thymeleaf-test/testfile'
+require 'thymeleaf_test/testfile'
 
 class TestPartsLibTest < TestThymeleafTestLib
 
