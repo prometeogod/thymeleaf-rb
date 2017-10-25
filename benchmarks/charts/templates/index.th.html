@@ -13,6 +13,7 @@
 
     <script type="text/javascript">
         var dataSets = [];
+        var dataSets2 = [];
     </script>
 </head>
 <body>
@@ -31,7 +32,7 @@
             <a href="#" onclick="window.location.reload()" class="btn btn-default btn-large glyphicon glyphicon-repeat"></a>
         </div>
         
-        <h2>Current benchmark comparison</h2>
+        <h2>Current Thymeleaf.rb versus ERB, IPS comparison</h2>
         <p class="text-muted description">The current status of all comparison tests (last build). Shows <b>IPS comparison</b> (more is better). Reload to get an updated chart with different colors.</p>
 
         <div class="general-chart">
@@ -53,7 +54,44 @@
             dataSets.push ({ label: "ERB 2", data: [randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30]});
         </script>
         
-        <script type="text/javascript">
+
+        <hr />
+    </section>
+    
+    <!-- Second Chart-->
+    <section class="container">
+        <!--Reload buttom-->
+        <div class="btn-group pull-right" style="margin-top: 25px">
+            <a href="#" onclick="window.location.reload()" class="btn btn-default btn-large glyphicon glyphicon-repeat"></a>
+        </div>
+        <!--Text before the chart-->
+        <h2>Current Thymeleaf.rb versus Thymeleaf-Noko, Memory comparison</h2>
+        <p class="text-muted description">The current status of all comparison tests (last build). Shows <b>Memory comparison</b> (less is better). Reload to get an updated chart with different colors.</p>
+
+        <div class="second-chart">
+            <canvas class="embed-responsive-item" id="second-chart"></canvas>
+        </div>
+
+        <!-- Chart Labels -->
+        <script type="text/javascript" data-th-text="var chartLabels2 = ${second_chart.x_axis_to_json}" >
+            var chartLabels2 = ["First iter.", "Second iter.", "Third iter.", "Fourth iter.", "Fifth iter.", "...", "N iter."];
+        </script>
+
+        <!-- Data Sets -->
+        <script type="text/javascript" data-th-each="history2 : ${second_chart.history_list}" data-th-text="dataSets2.push (${history2.to_json});">
+            var randomScalingFactor2 = function() {
+                return Math.round(Math.random() * 100);
+            };
+
+            dataSets2.push ({ label: "Thymeleaf-rb 1", data: [randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2()]});
+            dataSets2.push ({ label: "Thymeleaf-Noko 2", data: [randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30]});
+        </script>
+
+
+        <hr />
+
+    </section>
+            <script type="text/javascript">
             var randomColorFactor = function() {
                 return Math.round(Math.random() * 255);
             };
@@ -64,8 +102,49 @@
             var config = {
                 type: 'bar',
                 data: {
-                    labels: chartLabels,
+                    labels: chartLabels, 
                     datasets: dataSets
+                },
+                options: {
+                    responsive: true,
+                    title:{
+                        display:false
+                    },
+                    tooltips: {
+                        mode: 'label',
+                        callbacks: {}
+                    },
+                    hover: {
+                        mode: 'dataset'
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                show: true,
+                                labelString: 'Builds'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                show: true,
+                                labelString: 'IPS'
+                            },
+                            ticks: {
+                                suggestedMin: 0,
+                                suggestedMax: 260
+                            }
+                        }]
+                    }
+                }
+            };
+            
+            var config2 = {
+                type: 'bar',
+                data: {
+                    labels: chartLabels2, 
+                    datasets: dataSets2
                 },
                 options: {
                     responsive: true,
@@ -109,15 +188,22 @@
                 dataset.pointBackgroundColor = randomColor(0.5);
                 dataset.pointBorderWidth = 1;
             });
-
+         
+            $.each(config2.data.datasets, function(i,dataset) {
+                dataset.borderColor = randomColor(0.4);
+                dataset.backgroundColor = randomColor(0.5);
+                dataset.pointBorderColor = randomColor(0.7);
+                dataset.pointBackgroundColor = randomColor(0.5);
+                dataset.pointBorderWidth = 1;
+            }) 
             window.onload = function() {
                 var ctx = document.getElementById("general-chart").getContext("2d");
                 window.myLine = new Chart(ctx, config);
+                var ctx2 = document.getElementById("second-chart").getContext("2d");
+                window.myLine = new Chart(ctx2, config2)
             };
         </script>
-        <hr />
-    </section>
-    
+
     <section class="container">
         <h2>Single tests evolution</h2>
         <p class="text-muted">Here you can view each test comparison evolution individually.</p>

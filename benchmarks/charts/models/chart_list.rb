@@ -1,7 +1,7 @@
 
 class ChartList
 
-  RESULTS_DIR = "#{__dir__}/../../results"
+  RESULTS_DIR = "#{__dir__}/../../results/ips"
 
   def self.find(filter = '*')
 

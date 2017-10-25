@@ -4,7 +4,8 @@ require_relative 'chart_data'
 
 class ChartLoader
   
-  RESULTS_DIR = "#{__dir__}/../../results"
+  RESULTS_DIR = "#{__dir__}/../../results/ips"
+  RESULTS_DIR_MEM = "#{__dir__}/../../results/memory"
   
   def self.load_bench(bench_name)
     chart_data = ChartData.new
@@ -24,7 +25,7 @@ class ChartLoader
   def self.load_general_bench
     chart_data = ChartData.new
 
-    bench_list do |benchmark, axis_name|
+    bench_list(RESULTS_DIR) do |benchmark, axis_name|
       chart_data.x_axis.push axis_name.gsub('test_templates_', '').gsub('_th_test', '')
       json_content = JSON.parse benchmark
       
@@ -32,13 +33,26 @@ class ChartLoader
         chart_data.history_add_elem bench_data["name"], bench_data["ips"]
       end
     end
-
     chart_data
   end
   
-private
-  def self.bench_list
-    Dir.glob("#{RESULTS_DIR}/*_th_test").sort.each do |file|
+  def self.load_second_bench
+    chart_data = ChartData.new
+    bench_list(RESULTS_DIR_MEM) do |benchmark, axis_name|
+      chart_data.x_axis.push axis_name.gsub('test_templates_', '').gsub('_th_test', '')
+      json_array = JSON.parse benchmark
+      json_content = json_array.map { |element| JSON.parse element }
+      json_content.each do |bench_data|
+        chart_data.history_add_elem bench_data["name"], bench_data["allocated_memory"]
+      end  
+    end
+    chart_data
+  end
+
+  private
+
+  def self.bench_list(dir)
+    Dir.glob("#{dir}/*_th_test").sort.each do |file|
       bench_file = Dir.glob("#{file}/*.json").sort.first
 
       File.open bench_file, 'r' do |benchmark|

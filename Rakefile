@@ -15,6 +15,11 @@ task :clearcache do
   ruby 'lib/thymeleaf/utils/clear_cache.rb'
 end
 
+desc 'Clear Bench Results'
+task :clear_bench_result do 
+  ruby 'benchmarks/clear_bench_result.rb'
+end
+
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.libs << 'lib'
