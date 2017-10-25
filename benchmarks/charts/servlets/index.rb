@@ -11,6 +11,7 @@ class IndexServlet < BaseServlet
     template = get_template "index"
     context = {
         :general_chart => ChartLoader.load_general_bench,
+        :second_chart => ChartLoader.load_second_bench ,
         :chart_list    => ChartList.find
     }
     

@@ -6,7 +6,8 @@ class Benchmark::Memory::Job
     entries = run.comparison.entries
     hash_list = entries.map { |entry| to_h_entry(entry) }
     json_list = hash_list.map(&:to_json)
-    File.open(file_path, 'w+') { |file| file.puts json_list }
+    pretty_list = JSON.pretty_generate(json_list)
+    File.open(file_path, 'w+') { |file| file.puts pretty_list }
     file_path
   end
 
