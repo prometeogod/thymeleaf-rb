@@ -12,7 +12,8 @@ class ChartServlet < BaseServlet
     
     template = get_template "chart-details"
     context = {
-        :chart      => (ChartLoader.load_bench path[1]),
+        :chart      => (ChartLoader.load_bench_ips path[1]),
+        :second_chart => (ChartLoader.load_bench_memory path[1]),
         :chart_list => ChartList.find,
         :chart_name => path[1].gsub('_th_test', '').gsub('_', ' ')
     }

@@ -7,15 +7,29 @@ class ChartLoader
   RESULTS_DIR = "#{__dir__}/../../results/ips"
   RESULTS_DIR_MEM = "#{__dir__}/../../results/memory"
   
-  def self.load_bench(bench_name)
+  def self.load_bench_ips(bench_name)
     chart_data = ChartData.new
-    
-    bench_results(bench_name) do |bench_content, axis_name|
+
+    bench_results(bench_name, RESULTS_DIR) do |bench_content, axis_name|
         chart_data.x_axis_add axis_name
         json_content = JSON.parse bench_content
-        
         json_content.each do |bench_data|
           chart_data.history_add_elem bench_data["name"], bench_data["ips"]
+        end
+    end
+    
+    chart_data
+  end
+
+  def self.load_bench_memory(bench_name)
+    chart_data = ChartData.new
+
+    bench_results(bench_name, RESULTS_DIR_MEM) do |bench_content, axis_name|
+        chart_data.x_axis_add axis_name
+        json_array = JSON.parse bench_content
+        json_content = json_array.map { |element| JSON.parse element }
+        json_content.each do |bench_data|
+          chart_data.history_add_elem bench_data["name"], bench_data["allocated_memory"]
         end
     end
     
@@ -65,8 +79,8 @@ class ChartLoader
     end
   end
   
-  def self.bench_results(bench_name)
-    Dir.glob("#{RESULTS_DIR}/#{bench_name}/*.json").sort.each do |file|
+  def self.bench_results(bench_name, dir)
+    Dir.glob("#{dir}/#{bench_name}/*.json").sort.each do |file|
       File.open file, 'r' do |bench_file|
         bench_file.rewind
         name = File.basename file, '.json'

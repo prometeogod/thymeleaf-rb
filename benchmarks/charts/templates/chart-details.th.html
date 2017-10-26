@@ -13,6 +13,7 @@
 
     <script type="text/javascript">
         var dataSets = [];
+        var dataSets2 = [];
     </script>
 </head>
 <body>
@@ -53,8 +54,35 @@
         dataSets.push ({ label: "Thymeleaf-rb 1", data: [randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor(), randomScalingFactor()]});
         dataSets.push ({ label: "ERB 2", data: [randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30, randomScalingFactor() + 30]});
     </script>
+    <hr />
+</section>
+<section class="container">
+    <div class="btn-group pull-right" style="margin-top: 25px">
+         <a href="/" class="btn btn-default btn-large glyphicon glyphicon-menu-left"></a>
+        <a href="#" onclick="window.location.reload()" class="btn btn-default btn-large glyphicon glyphicon-repeat"></a>
+    </div>
+    <p class="text-muted description">The current test history. Shows <b>Memory allocated comparison</b> (less is better). Reload to get an updated chart with different colors.</p>
+
+    <div class="second_chart">
+        <canvas class="embed-responsive-item" id="second_chart"></canvas>
+    </div>
+    <!-- Chart Labels -->
+    <script type="text/javascript" data-th-text="var chartLabels2 = ${second_chart.x_axis_to_json}">
+        var chartLabels2 = ["First iter.", "Second iter.", "Third iter.", "Fourth iter.", "Fifth iter.", "...", "N iter."]; 
+    </script>
+    <!-- Data Sets -->
+    <script type="text/javascript" data-th-each="history2 : ${second_chart.history_list}" data-th-text="dataSets2.push (${history2.to_json});">
+        var randomScalingFactor2 = function() {
+            return Math.round(Math.random() * 100);
+        };
+        
+        dataSets2.push ({ label: "Thymeleaf-rb 1", data: [randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2(), randomScalingFactor2()]});
+        dataSets2.push ({ label: "Thymeleaf-Noko 2", data: [randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30, randomScalingFactor2() + 30]});
+    </script>
+    <hr />
     
-    
+</section>
+
     <script type="text/javascript">
 
         var randomColorFactor = function() {
@@ -105,7 +133,56 @@
             }
         };
 
+        var config2 = {
+            type: 'line',
+            data: {
+                labels: chartLabels2,
+                datasets: dataSets2
+            },
+            options: {
+                responsive: true,
+                title:{
+                    display:false
+                },
+                tooltips: {
+                    mode: 'label',
+                    callbacks: {}
+                },
+                hover: {
+                    mode: 'dataset'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Builds'
+                        }
+                    }],
+                    yAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            show: true,
+                            labelString: 'Memory'
+                        },
+                        ticks: {
+                            suggestedMin: 0,
+                            suggestedMax: 260
+                        }
+                    }]
+                }
+            }
+        };
+
         $.each(config.data.datasets, function(i, dataset) {
+            dataset.borderColor = randomColor(0.4);
+            dataset.backgroundColor = randomColor(0.5);
+            dataset.pointBorderColor = randomColor(0.7);
+            dataset.pointBackgroundColor = randomColor(0.5);
+            dataset.pointBorderWidth = 1;
+        });
+
+        $.each(config2.data.datasets, function(i, dataset) {
             dataset.borderColor = randomColor(0.4);
             dataset.backgroundColor = randomColor(0.5);
             dataset.pointBorderColor = randomColor(0.7);
@@ -116,10 +193,10 @@
         window.onload = function() {
             var ctx = document.getElementById("chart").getContext("2d");
             window.myLine = new Chart(ctx, config);
+            var ctx2 = document.getElementById("second_chart").getContext("2d");
+            window.myLine = new Chart(ctx2, config2)
         };
     </script>
-    <hr />
-</section>
 
 <section class="container">
     <h2>Single tests evolution</h2>
