@@ -1,10 +1,15 @@
 $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/test/"
 
+  add_group "Template Engine", "lib"
+  add_group "Benchmark", "benchmarks"
+end
 require 'thymeleaf'
 require 'minitest/autorun'
-
 class TestThymeleaf < Minitest::Test
-
+ 
   def render(source, context = {})
     Thymeleaf::Template.new(source, context).render
   end

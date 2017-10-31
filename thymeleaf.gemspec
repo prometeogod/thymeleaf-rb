@@ -30,4 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'benchmark-memory', '~> 0.1'
   spec.add_development_dependency 'webrick'
   spec.add_development_dependency 'json'
+  spec.add_development_dependency 'simplecov', '~> 0.12.0'
 end
