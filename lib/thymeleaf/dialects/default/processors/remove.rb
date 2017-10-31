@@ -73,8 +73,8 @@ class RemoveProcessor
     node.add_child(first)
   end
 
-  def empty_node?(node)
-    node.to_s.strip.empty?
+  def empty_attributes?(attributes)
+    attributes.empty?
   end
 
   def get_first_non_empty(node_set)
