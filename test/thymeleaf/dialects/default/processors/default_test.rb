@@ -1,18 +1,20 @@
-require 'thymeleaf/dialects/default/processors/default'
-require 'thymeleaf/context/context_struct'
-require 'thymeleaf/context/context_holder'
-require 'thymeleaf/nodetree'
-
+require 'thymeleaf'
+# DefaultProcessor test
 describe DefaultProcessor do
-
   def context
-    ContextHolder.new(ContextStruct.new())
+    ContextHolder.new(ContextStruct.new)
   end
 
-  #it 'renders data attribute without concatenation' do
-  #  node = {'placeholder'=>'initial'}
-  #  attr = Nokogiri::HTML::DocumentFragment.parse('<input data-th-placeholder="new"/>').children[0].attributes["data-th-placeholder"]
-  #  DefaultProcessor.new.call(key: 'placeholder', node: node, attribute: attr, context: context)
-  #  assert_equal 'new', node['placeholder']
-  #end
+  it 'renders data attribute without concatenation' do
+    key = 'placeholder'
+    fragment = '<input data-th-placeholder="new"/>'
+    handler = Thymeleaf::Parser.new(fragment).call
+    old_attr = { key => 'initial' }
+    node = NodeTree.new('input', old_attr)
+    parsed_template = handler.nodes
+    attr = parsed_template[0].attributes['data-th-placeholder']
+    processor = DefaultProcessor
+    processor.new.call(key: key, node: node, attribute: attr, context: context)
+    assert_equal 'new', node.attributes[key]
+  end
 end

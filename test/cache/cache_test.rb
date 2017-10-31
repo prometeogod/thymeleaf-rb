@@ -55,4 +55,13 @@ describe Cache do
 	  assert_equal @cache.get('keyValueDate').date , date
 	  assert_equal @cache.get('keyValueDate').value , 'value'
 	end
+
+	it 'should return an array with the keys' do
+      assert_equal @cache.keys, []
+      @cache.set(1,1)
+      @cache.set(2,2)
+      assert_equal @cache.keys, [1,2]
+      @cache.clear
+      assert_equal @cache.keys, []
+    end
 end

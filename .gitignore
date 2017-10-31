@@ -13,3 +13,6 @@ benchmarks/results/
 # Ignore cache files
 lib/thymeleaf/cache/parsed_cache/
 lib/thymeleaf/cache/fragment_cache/
+
+# Ignore coverage test
+coverage
