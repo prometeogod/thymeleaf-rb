@@ -1,6 +1,9 @@
 # Thymeleaf.rb
 
 [![Build Status](https://travis-ci.org/trabe/thymeleaf-rb.svg)](https://travis-ci.org/trabe/thymeleaf-rb)
+[![Maintainability](https://api.codeclimate.com/v1/badges/25678ac70201ee786395/maintainability)](https://codeclimate.com/github/prometeogod/thymeleaf-rb/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/25678ac70201ee786395/test_coverage)](https://codeclimate.com/github/prometeogod/thymeleaf-rb/test_coverage)
+
 
 Thymeleaf.rb is a Ruby adaptation of [Thymeleaf](http://www.thymeleaf.org), a natural templating engine.
 
