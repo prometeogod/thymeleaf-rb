@@ -1,10 +1,8 @@
 require 'thymeleaf'
-
 require_relative '../../../test_helper'
 require_relative 'hello_dialect'
-
+# Class RegisterDialectTest : a test class to register a test dialect
 class RegisterDialectTest < TestThymeleaf
-
   def template_content
     '<p data-say-hello="">Good bye</p>'
   end
@@ -19,5 +17,4 @@ class RegisterDialectTest < TestThymeleaf
     end
     assert_equal render(template_content, {}), template_result
   end
-
 end
