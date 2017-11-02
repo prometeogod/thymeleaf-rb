@@ -6,5 +6,17 @@ rvm:
 notifications:
   slack:
     secure: F5J9jlPdPGj1zzTh1ojpBQSG/faYY894r1HB8dVYyCOOuW4esdzJwdoud51WaDFaO97IcsHZlP/mOxQzSImmo6WTjwSe4NKuz+0/cDi0qCCGr+qG9wV0TsHSb2eTeQq6tM3Qi8T6tpZC6Rj9j2KZQsfMPBfCP9bt2yOpkIDu0gQ=
+before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
+script:
+  - bundle exec rake
+  - bundle exec codeclimate-test-reporter
+after_script:
+  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+addons:
+  code_climate:
+    repo_token: 415ad195fb95744429dbd4c42b90b2fe6ca262c1cfedb91de6c8cab92611d3f4
 sudo: false
 cache: bundler
