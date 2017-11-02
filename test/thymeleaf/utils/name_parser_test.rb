@@ -1,3 +1,4 @@
+# Test name_parser on lib/utils
 class TestNameParser < TestThymeleaf
   require 'thymeleaf/utils/name_parser'
 
@@ -10,11 +11,9 @@ class TestNameParser < TestThymeleaf
   end
 
   def test_to_file_name
-  	filename = 'test/templates/block.th.test'
+    filename = 'test/templates/block.th.test'
     cache_name = 'test_templates_block_th_test'
     suffix = '.th.test'
     assert_equal to_file_name(cache_name, suffix), filename
   end
- 
 end
-
