@@ -73,10 +73,6 @@ module ThymeleafTest
       Thymeleaf::Template.new(th_template, context).render(test_path)
     end
 
-    def test_last_modified
-      File.ctime(file)
-    end
-
     private
 
     attr_accessor :file
@@ -94,11 +90,6 @@ module ThymeleafTest
         raise WrongTestFileFormat unless parts.any?
         parts
       end
-    end
-
-    def atime
-      @file = File.open @file
-      puts @file.atime
     end
 
     def uniqueid

@@ -8,21 +8,8 @@ module Thymeleaf
       handler_nodes.each do |node|
         key = get_cache_key(context_holder, node) # Cuidado con esta operacion
         cache_manager = Thymeleaf.configuration.cache_manager
-        if cache_manager.fragment_cache.get(key).nil?
-          filename = RandomStringGenerator.new.random
-          if node.name != 'text-content'
-            process_node(context_holder, node, handler_nodes)
-          end
-          cache_manager.fragment_cache.set(key, node)
-          # TODO. Do the write in an exit event
-          cache_manager.write_file_fragment(node, key, filename)
-
-        else
-          new_node = cache_manager.fragment_cache.get(key)
-          ind = handler_nodes.index(node)
-          handler_nodes.delete_at(ind)
-          handler_nodes.insert(ind, new_node)
-        end
+        f_cache = cache_manager.f_cache
+        get_handler_nodes(f_cache, key, handler_nodes, node, context_holder)
       end
       handler_nodes
     end
@@ -86,7 +73,34 @@ module Thymeleaf
       {
         node: node.to_html,
         context: context_holder
-      }
+      }.to_s
+    end
+
+    def cached?(cache, key)
+      cache.set?(key)
+    end
+
+    def get_handler_nodes(f_cache, key, handler_nodes, node, context_holder)
+      if cached?(f_cache, key)
+        node_cached(f_cache, key, handler_nodes, node, context_holder)
+      else
+        node_uncached(f_cache, key, handler_nodes, node, context_holder)
+      end
+    end
+
+    def node_cached(f_cache, key, handler_nodes, node, _context_holder)
+      new_node = f_cache.get(key)
+      ind = handler_nodes.index(node)
+      handler_nodes.delete_at(ind)
+      handler_nodes.insert(ind, new_node)
+    end
+
+    def node_uncached(f_cache, key, handler_nodes, node, context_holder)
+      if node.name != 'text-content'
+        process_node(context_holder, node, handler_nodes)
+      end
+      f_cache.set(key, node)
+      handler_nodes
     end
   end
 end
