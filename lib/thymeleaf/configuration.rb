@@ -20,8 +20,6 @@ module Thymeleaf
     attr_accessor :dialects, :template, :parser, :cache_manager
     def initialize
       self.cache_manager = CacheManager.new
-      cache_manager.create_parsed_cache
-      cache_manager.create_fragment_cache
       self.dialects = Dialects.new
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new

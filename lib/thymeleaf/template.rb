@@ -21,37 +21,7 @@ module Thymeleaf
     private
 
     def do_render(template, filename = nil)
-      if !filename.nil?
-        cache_name = to_cache_name(filename.dup, '.th.parsed_cache')
-        name_parsed = cache_name.split('.th.parsed_cache')[0]
-        cache_manager = Thymeleaf.configuration.cache_manager
-        if !cache_manager.parsed_cache.get(cache_name).nil? # If is cached
-          cache_value = cache_manager.parsed_cache.get(cache_name)
-          parsed_template = cache_value.value
-          cache_date = cache_value.date
-          file_date = get_template_file_mtime(filename)
-          date_comparison = cache_date <=> file_date
-          if date_comparison == -1
-            cache_manager.parsed_cache.delete(cache_name)
-            handler = Parser.new(template).call
-            parsed_template = handler.nodes
-            node = NodeValueDate.new(parsed_template)
-            cache_manager.parsed_cache.set(cache_name, node)
-            cache_manager.write_file_cache(parsed_template, name_parsed)
-            # TODO, realizar la escritura en memoria en otro momento
-          end
-        else # If isn't cached
-          handler = Parser.new(template).call
-          parsed_template = handler.nodes
-          node = NodeValueDate.new(parsed_template)
-          cache_manager.parsed_cache.set(cache_name, node)
-          cache_manager.write_file_cache(parsed_template, name_parsed)
-          # TODO, realizar la escritura en memoria en otro momento
-        end
-      else
-        handler = Parser.new(template).call
-        parsed_template = handler.nodes
-      end
+      parsed_template = get_parsed_template(template, filename)
       context_holder = ContextHolder.new(context)
       TemplateEngine.new.call(parsed_template, context_holder)
       to_rendered_string(parsed_template)
@@ -64,20 +34,73 @@ module Thymeleaf
       end
     end
 
-    def get_template_file_mtime(file)
-      File.mtime(file)
-    end
-
     def to_rendered_string(parsed_template)
       rendered = ''
       parsed_template.each do |node|
         if !node.to_html.nil?
           rendered += node.to_html
         else
-          rendered += "\n"
+          rendered += "\n" # TODO, Beware this \n
         end
       end
       rendered
+    end
+
+    def get_parsed_template(template, filename)
+      if !filename.nil?
+        key = to_cache_name(filename.dup, '.th.parsed_cache')
+        cache_manager = Thymeleaf.configuration.cache_manager
+        p_cache = cache_manager.p_cache
+        template_caching(p_cache, key, template, filename)
+      else
+        handler = Parser.new(template).call
+        handler.nodes
+      end
+    end
+
+    def template_caching(p_cache, key, template, filename)
+      if cached?(p_cache, key)
+        node_cached(p_cache, key, template, filename)
+      else
+        node_uncached(p_cache, key, template, filename)
+      end
+    end
+
+    def node_cached(p_cache, key, template, filename)
+      nodevd = p_cache.get(key)
+      cache_date = nodevd.date
+      file_date = get_template_file_mtime(filename)
+      parsed_template = nodevd.value
+      date_comparison = cache_date <=> file_date
+      if date_comparison == -1
+        parsed_template = node_recached(p_cache, key, template)
+      end
+      parsed_template
+    end
+
+    def node_recached(p_cache, key, template)
+      p_cache.unset(key)
+      handler = Parser.new(template).call
+      parsed_template = handler.nodes
+      node = NodeValueDate.new(parsed_template)
+      p_cache.set(key, node)
+      parsed_template
+    end
+
+    def node_uncached(p_cache, key, template, _filename)
+      handler = Parser.new(template).call
+      parsed_template = handler.nodes
+      node = NodeValueDate.new(parsed_template)
+      p_cache.set(key, node)
+      parsed_template
+    end
+
+    def cached?(cache, key)
+      cache.set?(key)
+    end
+
+    def get_template_file_mtime(file)
+      File.mtime(file)
     end
   end
 end
