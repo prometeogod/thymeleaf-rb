@@ -45,4 +45,51 @@ class SaxHandler
     end
     string
   end
+
+  def on_comment(comment)
+    node_comment = NodeTree.new('comment', comment)
+    parent = @names.last
+    if parent.nil?
+      @nodes << node_comment
+    else
+      parent.add_child(node_comment)
+    end
+  end
+
+  def on_doctype(node)
+    doctype_string = output_doctype(node)
+    node_doctype = NodeTree.new('doctype', doctype_string)
+    parent = @names.last
+    if parent.nil?
+      @nodes << node_doctype
+    else
+      parent.add_child(node_doctype)
+    end
+  end
+
+  #  def on_document;end
+
+  #  def on_cdata;end
+
+  #  def on_proc_ins;end
+
+  #  def on_xml_decl;end
+
+  #  def on_element_children;end
+
+  # def on_attribute;end
+
+  # def on_attributes;end
+
+  private
+
+  def output_doctype(node)
+    output = ''
+    output << "<!DOCTYPE #{node[:name]}"
+    output << " #{node.type}" if node[:type]
+    output << %("#{node.public_id}") if node[:public_id]
+    output << %("#{node.system_id}") if node[:system_id]
+    output << " [#{node.inline_rules}]" if node[:inline_rules]
+    output << '>'
+  end
 end

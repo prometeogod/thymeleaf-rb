@@ -1,4 +1,5 @@
 require_relative './utils/random_string_generator'
+require_relative './utils/key_words'
 require 'json'
 
 module Thymeleaf
@@ -23,7 +24,7 @@ module Thymeleaf
       children_context = process_tag(attr_context, node, node_list)
       # Last we process the children nodes of the tree
       node.children.each do |child|
-        if child.name != 'text-content'
+        if !key_word?(child.name)
           process_node(children_context, child, node.children)
         end
       end
@@ -31,7 +32,7 @@ module Thymeleaf
 
     def process_attributes(context_holder, node, node_list)
       attr_context = context_holder
-      if node.name != 'text-content'
+      if !key_word?(node.name)
         unless node.attributes.empty?
           node.attributes.each do |attribute_key, attribute|
             attr_context = process_attribute(attr_context, node, attribute_key, attribute, node_list)
@@ -96,7 +97,7 @@ module Thymeleaf
     end
 
     def node_uncached(f_cache, key, handler_nodes, node, context_holder)
-      if node.name != 'text-content'
+      if !key_word?(node.name)
         process_node(context_holder, node, handler_nodes)
       end
       f_cache.set(key, node)

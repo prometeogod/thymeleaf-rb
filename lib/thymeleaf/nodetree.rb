@@ -1,3 +1,4 @@
+require_relative './utils/key_words'
 # NodeTree class definition : Structure to recreate the HTML template
 class NodeTree
   attr_accessor :name, :attributes, :children, :parent
@@ -49,7 +50,8 @@ class NodeTree
 
   def to_html
     string = ''
-    string + name == 'text-content' ? to_html_text(self) : to_html_regular(self)
+    condition = key_word?(name)
+    string + (condition ? to_html_text(self) : to_html_regular(self))
   end
 
   private
@@ -68,7 +70,16 @@ class NodeTree
   end
 
   def to_html_text(node)
-    node.attributes
+    case node.name
+    when 'text-content'
+      node.attributes
+    when 'comment'
+      '<!--' + node.attributes + '-->'
+    when 'doctype'
+      node.attributes
+    when 'meta'
+      '<' + node.name + to_s_attributes(node.attributes) + '/>'
+    end
   end
 
   def to_html_regular(node, string = '')
@@ -80,7 +91,8 @@ class NodeTree
 
   def to_html_regular_child(nodes, str = '')
     nodes.each do |n|
-      str += n.name == 'text-content' ? to_html_text(n) : to_html_regular(n)
+      condition = key_word?(n.name)
+      str += (condition ? to_html_text(n) : to_html_regular(n))
     end
     str
   end
