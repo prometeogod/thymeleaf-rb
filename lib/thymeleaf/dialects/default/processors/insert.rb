@@ -3,7 +3,6 @@ class InsertProcessor
   include Thymeleaf::Processor
 
   require_relative '../parsers/fragment'
-  require_relative '../parsers/fragment'
 
   def call(node: nil, attribute: nil, context: nil, **_)
     node.attributes.delete('data-th-insert')
@@ -72,7 +71,7 @@ class InsertProcessor
 
   def get_fragment_dom_replacement(fragment_name, template)
     template.each do |node|
-      next unless node.name != 'text-content'
+      next unless !key_word?(node.name)
       node.attributes.each do |key, value|
         return node if key == 'id' && value == fragment_name
       end

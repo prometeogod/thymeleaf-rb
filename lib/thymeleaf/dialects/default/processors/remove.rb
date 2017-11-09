@@ -1,4 +1,5 @@
 require_relative '../../../utils/booleanize'
+require_relative '../../../utils/key_words'
 # RemoveProcessor class definition : it process remove
 class RemoveProcessor
   include Thymeleaf::Processor
@@ -68,19 +69,20 @@ class RemoveProcessor
   end
 
   def remove_allbutfirst(node, _list, _)
-    first = get_first_non_empty(node.children).dup
-    node.children.clear
-    node.add_child(first)
+    array = node.children
+    first = get_first_non_empty(array)
+    i = array.index(first)
+    array.delete_if{|sub| array.index(sub) != i}
   end
 
-  def empty_attributes?(attributes)
-    attributes.empty?
+  def empty_string?(attributes)
+    attributes.strip.empty?
   end
 
   def get_first_non_empty(node_set)
     node_set.each do |child|
-      cond1 = child.name == 'text-content' && !empty_node?(child.attributes)
-      cond2 = child.name != 'text-content'
+      cond1 = key_word?(child.name) && !empty_string?(child.attributes)
+      cond2 = !key_word?(child.name)
       return child if cond1 || cond2
     end
   end
