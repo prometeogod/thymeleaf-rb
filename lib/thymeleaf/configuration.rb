@@ -3,6 +3,8 @@ require_relative 'dialects/default/default_dialect'
 require_relative 'template/template_resolver'
 require_relative 'parser/parse_options'
 require_relative 'cache/cache_manager'
+require_relative 'cache/precompile_mini_cache'
+require 'mini_cache'
 # Thymeleaf module
 module Thymeleaf
   class << self

@@ -1,10 +1,19 @@
 require_relative './utils/random_string_generator'
 require_relative './utils/key_words'
+require_relative 'node_writer'
+require_relative './precompile/precompile_buffer'
 require 'json'
 
 module Thymeleaf
   # TemplateEngine class definition
   class TemplateEngine
+    
+    attr_accessor :buffer
+    
+    def initialize
+      self.buffer = PrecompileBuffer.new
+    end
+
     def call(handler_nodes, context_holder)
       handler_nodes.each do |node|
         key = get_cache_key(context_holder, node) # Cuidado con esta operacion
@@ -12,7 +21,7 @@ module Thymeleaf
         f_cache = cache_manager.f_cache
         get_handler_nodes(f_cache, key, handler_nodes, node, context_holder)
       end
-      handler_nodes
+      [handler_nodes, buffer]
     end
 
     private
@@ -26,6 +35,19 @@ module Thymeleaf
       node.children.each do |child|
         if !key_word?(child.name)
           process_node(children_context, child, node.children)
+        else # If node text-content or any keyword
+          if node.markup == false
+            #NodeWriter.write_text(child)
+            if child.del_tail != true
+              NodeWriter.write_text_buffer(buffer,child)
+            end
+          end
+        end
+      end
+      #NodeWriter.write_tail(node) if node_list.include?(node)
+      if node_list.include?(node)
+        if node.del_tail != true
+          NodeWriter.write_tail_buffer(buffer,node)
         end
       end
     end
@@ -52,12 +74,11 @@ module Thymeleaf
     def process_tag(context_holder, node, node_list)
       dialects = Thymeleaf.configuration.dialects
       key, processor = * dialects.find_tag_processor(node.name)
-
       process_element(context_holder, node, nil, key, processor, node_list)
     end
 
     def process_element(context_holder, node, attribute, key, processor, node_list)
-      subcontext = processor.call(key: key, node: node, attribute: attribute, context: context_holder, list: node_list)
+      subcontext = processor.call(key: key, node: node, attribute: attribute, context: context_holder, list: node_list, buffer: buffer)
       if processor_has_subcontext?(processor)
         subcontext
       else

@@ -1,9 +1,9 @@
+require_relative 'node_writer'
 # Module Thymeleaf definition
 module Thymeleaf
   # Module Processor definition
   module Processor
     require_relative 'processor/context_evaluator'
-
     def evaluate_in_context(context, expr)
       ContextEvaluator.new(context).evaluate(expr)
     end
@@ -23,6 +23,17 @@ module Thymeleaf
   end
   # NullProcessor class definition
   class NullProcessor
-    def call(**_); end
+    def call(node: nil, buffer: nil, **_)
+      if node.markup==false
+        if node.name != 'text-content'
+          #NodeWriter.write_head(node)
+          NodeWriter.write_head_buffer(buffer, node)
+        else
+          #NodeWriter.write_text(node)
+          NodeWriter.write_text_buffer(buffer, node)
+        end
+      end 
+    end
+
   end
 end

@@ -1,13 +1,14 @@
 require_relative './utils/key_words'
 # NodeTree class definition : Structure to recreate the HTML template
 class NodeTree
-  attr_accessor :name, :attributes, :children, :parent
+  attr_accessor :name, :attributes, :children, :parent, :markup, :del_tail
 
-  def initialize(name, attributes = {}, children = [], parent = nil)
+  def initialize(name, attributes = {}, children = [], parent = nil, markup = false, del_tail = false)
     self.name = name
     self.attributes = attributes
     self.children = children
     self.parent = parent
+    self.markup = markup
   end
 
   def add_child(node)
@@ -52,6 +53,40 @@ class NodeTree
     string = ''
     condition = key_word?(name)
     string + (condition ? to_html_text(self) : to_html_regular(self))
+  end
+
+  def mark
+    self.markup = true
+  end
+
+  def mark_decendents
+    children = self.children
+    if children != nil
+      children.each do |child|
+        child.mark
+        child.mark_decendents
+      end
+    end
+    children
+  end
+
+  def delete_tail
+    self.del_tail = true
+  end
+
+  def delete_tail_decendents
+    children = self.children
+    if children != nil
+      children.each do |child|
+        child.delete_tail
+        child.delete_tail_decendents
+      end
+    end
+    children
+  end
+
+  def to_s_attr
+    to_s_attributes(self.attributes)
   end
 
   private
