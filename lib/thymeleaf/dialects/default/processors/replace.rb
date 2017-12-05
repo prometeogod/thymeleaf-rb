@@ -4,7 +4,7 @@ require_relative 'insert'
 class ReplaceProcessor < InsertProcessor
   include Thymeleaf::Processor
 
-  def call(node: nil, attribute: nil, context: nil, list: nil, **_)
+  def call(node: nil, attribute: nil, context: nil, list: nil, buffer: nil, **_)
     node.attributes.delete('data-th-replace')
     template, fragment = FragmentExpression.parse(context, attribute)
 
@@ -22,9 +22,26 @@ class ReplaceProcessor < InsertProcessor
     return if node_subcontent.nil?
 
     process_node_subcontent(node_subcontent, node, context, list)
+    # Precompile buffer
+    write_buffer(buffer, node, node_subcontent)
+    #
   end
 
   private
+  
+  def write_buffer(buffer, node, node_subcontent)
+    node.mark
+    node.mark_decendents
+    node.delete_tail
+    node.delete_tail_decendents
+    if !node_subcontent.is_a?(Array)
+      NodeWriter.write_buffer(buffer, node_subcontent.to_html)
+    else
+      node_subcontent.each do |sub|
+        NodeWriter.write_buffer(buffer, sub.to_html)
+      end
+    end
+  end
 
   def process_node_subcontent(node_subcontent, node, context, list)
     if node_subcontent.is_a?(Array)

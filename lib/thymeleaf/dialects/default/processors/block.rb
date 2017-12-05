@@ -11,7 +11,9 @@ class BlockProcessor
       subprocess_node(context, child, list)
       node.add_next_sibling(child)
     end
+    # Precompile buffer
     write_buffer(node, buffer)
+    #
     list.delete(node)
   end
 

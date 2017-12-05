@@ -3,13 +3,21 @@ class EachProcessor
   include Thymeleaf::Processor
   require_relative '../parsers/each'
 
-  def call(node: nil, attribute: nil, context: nil, list: nil, **_)
+  def call(node: nil, attribute: nil, context: nil, list: nil, buffer: nil, **_)
     variable, stat, enumerable = EachExpression.parse(context, attribute)
-
+    # Node markup
+    print_list = []
+    if !node.marked?
+      node.mark
+      node.delete_tail
+      node.mark_decendents
+      node.delete_tail_decendents
+      print_list << node
+    end
+    #
     elements = evaluate_in_context(context, enumerable)
     stat_var = init_stat_var(stat, elements)
     node.attributes.delete('data-th-each')
-
     elements.each do |element|
       subcontext_vars = {}
       subcontext_vars[variable] = element unless variable.nil?
@@ -25,9 +33,18 @@ class EachProcessor
       end
       subcontext = ContextHolder.new(subcontext_vars, context)
       new_node = node.deep_clone
+      #
+      new_node.mark
+      new_node.mark_decendents
+      #
       subprocess_node(subcontext, new_node, list)
       node.add_previous_sibling(new_node)
     end
+    # Precompile buffer
+    if print_list.include?(node)
+      write_buffer(buffer, node.marshalled)
+    end
+    #
     node.children.clear
     list.delete(node)
     context
@@ -54,5 +71,12 @@ class EachProcessor
         last: false
       }
     end
+  end
+
+  def write_buffer(buffer, marshall_list)
+    marshall_list.each do |element|
+      NodeWriter.write_buffer(buffer, element.to_html)
+    end
+    NodeWriter.write_empty_line_buffer(buffer)
   end
 end

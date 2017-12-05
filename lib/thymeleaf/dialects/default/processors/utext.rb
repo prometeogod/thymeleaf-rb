@@ -16,18 +16,21 @@ class UTextProcessor
     childs.each do |child|
       node.add_child(child)
     end
-    node.mark
-    node.mark_decendents
     node.attributes.delete('data-th-utext')
-    write_buffer(node, child_utext, buffer)
+    # Precompile buffer
+    if !node.marked?
+      node.mark
+      node.mark_decendents
+      node.delete_tail_decendents
+      write_buffer(node, child_utext, buffer)
+    end
+    #
     node
   end
 
   private 
 
   def write_buffer(node, child_utext, buffer)
-    #NodeWriter.write_head(node)
-    #NodeWriter.write(child_text)
     NodeWriter.write_head_buffer(buffer, node)
     NodeWriter.write_buffer(buffer, child_utext)
   end

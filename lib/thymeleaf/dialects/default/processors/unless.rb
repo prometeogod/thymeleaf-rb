@@ -9,14 +9,18 @@ class UnlessProcessor
     return unless booleanize EvalExpression.parse(context, attribute)
     node.children.clear
     node.attributes.clear
+    # Node markup
     node.mark
+    #
     list.delete(node)
+    # Precompile buffer
     write_buffer(buffer)
+    #
   end
 
   private 
 
   def write_buffer(buffer)
-  	NodeWriter.write_buffer(buffer, "\n") # TODO, Beware this \n
+  	# NodeWriter.write_empty_line_buffer(buffer)
   end
 end

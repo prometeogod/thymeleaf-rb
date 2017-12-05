@@ -8,12 +8,16 @@ class CaseProcessor
     var_cmp = EvalExpression.parse(context, attribute)
 
     return if case_equals? context, var_cmp
+    # Node markup
     node.mark
     node.mark_decendents
     node.children.clear
     node.attributes.clear
+    #
     list.delete(node)
+    # Precompile buffer
     write_buffer(buffer)
+    #
   end
 
   def case_equals?(context, var_comparation)
@@ -25,6 +29,6 @@ class CaseProcessor
   private
 
   def write_buffer(buffer)
-    NodeWriter.write_empty_line_buffer(buffer)
+    # NodeWriter.write_empty_line_buffer(buffer)
   end
 end

@@ -11,18 +11,20 @@ class TextProcessor
     child = NodeTree.new('text-content', child_text)
     node.children.clear
     node.add_child(child)
-    node.mark
-    node.mark_decendents
     node.attributes.delete('data-th-text')
-    write_buffer(node, child_text, buffer)
+    # Precompile buffer
+    if !node.marked?
+      node.mark
+      node.mark_decendents
+      write_buffer(node, child_text, buffer)
+    end
+    #
     node
   end
 
   private 
 
   def write_buffer(node, child_text, buffer)
-    #NodeWriter.write_head(node)
-    #NodeWriter.write(child_text)
     NodeWriter.write_head_buffer(buffer, node)
     NodeWriter.write_buffer(buffer, child_text)
   end
