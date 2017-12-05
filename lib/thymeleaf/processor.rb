@@ -24,16 +24,11 @@ module Thymeleaf
   # NullProcessor class definition
   class NullProcessor
     def call(node: nil, buffer: nil, **_)
-      if node.markup==false
-        if node.name != 'text-content'
-          #NodeWriter.write_head(node)
-          NodeWriter.write_head_buffer(buffer, node)
-        else
-          #NodeWriter.write_text(node)
-          NodeWriter.write_text_buffer(buffer, node)
-        end
+      if !node.marked?
+        node.mark
+        NodeWriter.write_head_buffer(buffer, node)
+        # NodeWriter.write_empty_line_buffer(buffer)
       end 
     end
-
   end
 end

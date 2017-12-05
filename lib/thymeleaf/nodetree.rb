@@ -1,14 +1,15 @@
 require_relative './utils/key_words'
 # NodeTree class definition : Structure to recreate the HTML template
 class NodeTree
-  attr_accessor :name, :attributes, :children, :parent, :markup, :del_tail
+  attr_accessor :name, :attributes, :children, :parent, :markup, :del_tail, :marshalled
 
-  def initialize(name, attributes = {}, children = [], parent = nil, markup = false, del_tail = false)
+  def initialize(name, attributes = {}, children = [], parent = nil, marshalled = [], markup = false, del_tail = false)
     self.name = name
     self.attributes = attributes
     self.children = children
     self.parent = parent
     self.markup = markup
+    self.marshalled = marshalled
   end
 
   def add_child(node)
@@ -38,7 +39,9 @@ class NodeTree
   end
 
   def deep_clone
-    Marshal.load(Marshal.dump(self))
+    new_node = Marshal.load(Marshal.dump(self))
+    self.marshalled << new_node
+    new_node
   end
 
   def to_h
@@ -55,10 +58,17 @@ class NodeTree
     string + (condition ? to_html_text(self) : to_html_regular(self))
   end
 
+  def unmark
+    self.markup = false
+  end
+  
   def mark
     self.markup = true
   end
-
+  def marked?
+    return true if self.markup == true
+    return false
+  end
   def mark_decendents
     children = self.children
     if children != nil

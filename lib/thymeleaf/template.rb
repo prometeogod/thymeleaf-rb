@@ -27,17 +27,17 @@ module Thymeleaf
         parsed_template, buffer = TemplateEngine.new.call(parsed_template, context_holder)
         # Set the buffer to the cache
         key = template + context.to_s
-        Thymeleaf.configuration.cache_manager.pre_cache.set(key, buffer)
+        Thymeleaf.configuration.pre_cache.set(key, buffer)
         buffer.to_html
       else
-        buffer = Thymeleaf.configuration.cache_manager.pre_cache.get(template + context.to_s)
+        buffer = Thymeleaf.configuration.pre_cache.get(template + context.to_s)
         buffer.to_html
       end
     end
 
     def precompiled(template, context)
       key = template + context.to_s
-      buffer = Thymeleaf.configuration.cache_manager.pre_cache.get(key)
+      buffer = Thymeleaf.configuration.pre_cache.get(key)
       if buffer != nil 
         true
       else

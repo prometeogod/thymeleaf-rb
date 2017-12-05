@@ -36,10 +36,10 @@ module Thymeleaf
         if !key_word?(child.name)
           process_node(children_context, child, node.children)
         else # If node text-content or any keyword
-          if node.markup == false
-            #NodeWriter.write_text(child)
+          if child.markup == false
             if child.del_tail != true
-              NodeWriter.write_text_buffer(buffer,child)
+              child.mark
+              write_keyword_buffer(buffer, child, child.name)
             end
           end
         end
@@ -48,7 +48,23 @@ module Thymeleaf
       if node_list.include?(node)
         if node.del_tail != true
           NodeWriter.write_tail_buffer(buffer,node)
+          # NodeWriter.write_empty_line_buffer(buffer)
         end
+      end
+    end
+ 
+    def write_keyword_buffer(buffer, node, keyword)
+      case keyword
+      when 'text-content'
+        NodeWriter.write_text_buffer(buffer, node)
+      when 'comment'
+        comment = '<!--' + node.attributes + '-->'
+        NodeWriter.write_buffer(buffer, comment)
+      when 'doctype'
+        NodeWriter.write_buffer(buffer, node.attributes)
+      when 'meta'
+        meta = '<' + node.name + node.to_s_attr + '/>'
+        NodeWriter.write_buffer(buffer, meta)
       end
     end
 
@@ -120,6 +136,10 @@ module Thymeleaf
     def node_uncached(f_cache, key, handler_nodes, node, context_holder)
       if !key_word?(node.name)
         process_node(context_holder, node, handler_nodes)
+      else 
+        # Precompile
+        write_keyword_buffer(buffer, node, node.name)
+        #
       end
       f_cache.set(key, node)
       handler_nodes

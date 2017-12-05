@@ -8,12 +8,11 @@ require 'json'
 
 # CacheManager definition : Controls the E/S operations for the Cache
 class CacheManager
-  attr_accessor :p_cache, :f_cache, :pre_cache
+  attr_accessor :p_cache, :f_cache
 
   def clear_caches
     p_cache.reset
     f_cache.reset
-    pre_cache.reset
   end
 
   def p_cache
@@ -22,9 +21,5 @@ class CacheManager
 
   def f_cache
     self.f_cache = FragmentCache.instance
-  end
-
-  def pre_cache
-    self.pre_cache = PrecompileCache.instance
   end
 end
