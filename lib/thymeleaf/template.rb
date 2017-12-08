@@ -21,10 +21,28 @@ module Thymeleaf
     private
 
     def do_render(template, filename = nil)
-      parsed_template = get_parsed_template(template, filename)
-      context_holder = ContextHolder.new(context)
-      TemplateEngine.new.call(parsed_template, context_holder)
-      to_rendered_string(parsed_template)
+      if !precompiled?(template, context)
+        parsed_template = get_parsed_template(template, filename)
+        context_holder = ContextHolder.new(context)
+        TemplateEngine.new.call(parsed_template, context_holder)
+        procesed = to_rendered_string(parsed_template)
+        key = template + context.to_s
+        Thymeleaf.configuration.pre_cache.set(key,procesed)
+        procesed
+      else
+        key = template + context.to_s
+        Thymeleaf.configuration.pre_cache.get(key)
+      end
+    end
+
+    def precompiled?(template, context)
+      key = template + context.to_s
+      template = Thymeleaf.configuration.pre_cache.get(key)
+      if template != nil 
+        true
+      else
+        false
+      end
     end
 
     def template_file_open(template_file)
