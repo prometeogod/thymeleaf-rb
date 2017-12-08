@@ -54,7 +54,7 @@ ThymeleafTest::TestDir::find_erb do |testfile|
 
   Benchmark.memory do |x|
     x.report("thymeleaf.rb") { ThTestRunner::render(testfile)  }
-    x.report("thymeleaf-Nokogiri") { ThNokoTestRunner::render(testfile)  }
+    x.report("ERB") { ErbTestRunner::render(testfile)  }
     x.compare!
     Dir.mkdir(save_test_dir_m) unless Dir.exists?(save_test_dir_m)
     Dir.mkdir(save_test_dir_memory) unless Dir.exists?(save_test_dir_memory)

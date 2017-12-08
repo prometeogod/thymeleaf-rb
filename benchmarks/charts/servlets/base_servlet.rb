@@ -1,7 +1,5 @@
 
 require_relative '../../../lib/thymeleaf' #Use this
-#require_relative '../../../compare/thymeleaf-Noko/thymeleaf-Noko' #TODO Remove  
-
 
 class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
   
@@ -25,17 +23,6 @@ class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
   end
   
   def render_template(template, context)
-    result=Thymeleaf::Template.new(template, context).render.to_s #TODO Use this
-    #result = ThymeleafNoko::Template.new(template, context).render.to_s #TODO Remove
-    dump_result(result)
-    result
-  end
-
-  private 
-
-  def dump_result(result)
-    File.open('hola1.html','w') do |f|
-      f.write(result)
-    end
+    result=Thymeleaf::Template.new(template, context).render.to_s
   end
 end
