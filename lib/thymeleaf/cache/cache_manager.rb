@@ -1,7 +1,6 @@
 require_relative '../nodetree'
 require_relative 'cache'
-require_relative 'parsed_mini_cache'
-require_relative 'fragment_mini_cache'
+require_relative 'store'
 require_relative 'node_value_date'
 require 'json'
 
@@ -15,10 +14,10 @@ class CacheManager
   end
 
   def p_cache
-    self.p_cache = ParsedCache.instance
+    self.p_cache = Store.new
   end
 
   def f_cache
-    self.f_cache = FragmentCache.instance
+    self.f_cache = Store.new
   end
 end
