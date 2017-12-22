@@ -1,6 +1,4 @@
-
 require_relative '../../../lib/thymeleaf'
-
 
 class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
   
@@ -26,5 +24,4 @@ class BaseServlet < WEBrick::HTTPServlet::AbstractServlet
   def render_template(template, context)
     Thymeleaf::Template.new(template, context).render.to_s
   end
-
 end

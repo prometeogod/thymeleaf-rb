@@ -3,8 +3,7 @@ require_relative 'dialects/default/default_dialect'
 require_relative 'template/template_resolver'
 require_relative 'parser/parse_options'
 require_relative 'cache/cache_manager'
-require_relative 'cache/precompile_mini_cache'
-require 'mini_cache'
+require_relative 'cache/store'
 # Thymeleaf module
 module Thymeleaf
   class << self
@@ -22,7 +21,7 @@ module Thymeleaf
     attr_accessor :dialects, :template, :parser, :cache_manager, :pre_cache
     def initialize
       self.cache_manager = CacheManager.new
-      self.pre_cache = MiniCache::Store.new
+      self.pre_cache = Store.new
       self.dialects = Dialects.new
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new

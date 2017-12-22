@@ -1,11 +1,4 @@
-require_relative '../nodetree'
-require_relative 'cache'
-require_relative 'parsed_mini_cache'
-require_relative 'fragment_mini_cache'
-require_relative 'precompile_mini_cache'
-require_relative 'node_value_date'
-require 'json'
-
+require_relative 'store'
 # CacheManager definition : Controls the E/S operations for the Cache
 class CacheManager
   attr_accessor :p_cache, :f_cache
@@ -16,10 +9,10 @@ class CacheManager
   end
 
   def p_cache
-    self.p_cache = ParsedCache.instance
+    self.p_cache = Store.new
   end
 
   def f_cache
-    self.f_cache = FragmentCache.instance
+    self.f_cache = Store.new
   end
 end
