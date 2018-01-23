@@ -1,4 +1,5 @@
 # Thymeleaf module
+require_relative 'precompile/precompile_processors/null_preprocessor'
 module Thymeleaf
   # Dialects class definition
   class Dialects
@@ -44,7 +45,8 @@ module Thymeleaf
     end
 
     def null_processor
-      @null_prccesor ||= NullProcessor.new
+      @null_processor ||= NullProcessor.new
+      #@null_processor ||= NullPreprocessor.new
     end
 
     def expand_key_dialect(*args)
