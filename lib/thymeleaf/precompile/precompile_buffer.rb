@@ -9,15 +9,7 @@ class PrecompileBuffer
     self.buffer << string
   end
 
-  def to_html
-  	string = ''
-    buffer.each do |line|
-      string += line
-    end
-    string
-  end
-
-  def to_file(file)
-
+  def flush
+  	buffer.join
   end
 end
