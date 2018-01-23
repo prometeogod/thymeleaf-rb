@@ -1,5 +1,6 @@
 require_relative 'dialects'
 require_relative 'dialects/default/default_dialect'
+require_relative 'precompile/precompile_dialect'
 require_relative 'template/template_resolver'
 require_relative 'parser/parse_options'
 require_relative 'cache/cache_manager'
@@ -26,6 +27,7 @@ module Thymeleaf
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new
       add_dialect DefaultDialect
+      #add_dialect PrecompileDialect
     end
 
     def add_dialect(*args)
