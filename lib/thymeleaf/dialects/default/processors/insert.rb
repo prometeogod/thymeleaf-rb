@@ -4,7 +4,7 @@ class InsertProcessor
 
   require_relative '../parsers/fragment'
 
-  def call(node: nil, attribute: nil, context: nil, buffer: nil, **_)
+  def call(node: nil, attribute: nil, context: nil, **_)
     node.attributes.delete('data-th-insert')
     template, fragment = FragmentExpression.parse(context, attribute)
     node_subcontent = get_node_template(template, node, context)
@@ -24,24 +24,10 @@ class InsertProcessor
     else
       node_subcontent.dup.parent = node
     end
-    # Precompile buffer
-    if !node_subcontent.is_a?(Array)
-      write_buffer(buffer, node, node_subcontent)
-    end
-    #
+    
   end
 
   private
-
-  def write_buffer(buffer, node, node_subcontent)
-    node.mark
-    node.mark_decendents
-    node.delete_tail
-    node.delete_tail_decendents
-    NodeWriter.write_head_buffer(buffer, node)
-    NodeWriter.write_buffer(buffer, node_subcontent.to_html)
-    NodeWriter.write_tail_buffer(buffer, node)
-  end
 
   def get_node_template(template, node, context)
     if self_template? template

@@ -90,8 +90,7 @@ class TestFileLibTest < TestThymeleafTestLib
     end
     ThymeleafTest::TestDir.find('test/templates/**') do |file|
       if file != '.' && file != '..'
-        #assert_equal file.render_test, file.expected_fragment
-        assert_equals_html file.expected_fragment, file.render_test
+        assert_equal file.render_test, file.expected_fragment
       end
     end
   end

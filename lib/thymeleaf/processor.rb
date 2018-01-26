@@ -1,4 +1,3 @@
-require_relative 'node_writer'
 # Module Thymeleaf definition
 module Thymeleaf
   # Module Processor definition
@@ -23,12 +22,7 @@ module Thymeleaf
   end
   # NullProcessor class definition
   class NullProcessor
-    def call(node: nil, buffer: nil, **_)
-      if !node.marked?
-        node.mark
-        NodeWriter.write_head_buffer(buffer, node)
-        # NodeWriter.write_empty_line_buffer(buffer)
-      end 
+    def call(**_)
     end
   end
 end

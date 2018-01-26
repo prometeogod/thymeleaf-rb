@@ -70,19 +70,4 @@ describe NodeTree do
     html_string = @node.to_html
     assert_equal html_string, '<name><child></child></name>'
   end
-
-  it 'should mark the node' do 
-    assert_equal @node.markup, false
-    @node.mark
-    assert_equal @node.markup, true
-  end
-
-  it 'should mark node decendents' do 
-    grandchild = NodeTree.new('grandchild')
-    assert_equal grandchild.markup, false
-    @child.add_child(grandchild)
-    @node.add_child(@child)
-    @node.mark_decendents
-    assert_equal grandchild.markup, true
-  end
 end
