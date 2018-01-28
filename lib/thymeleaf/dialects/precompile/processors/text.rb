@@ -1,5 +1,5 @@
-require_relative '../buffer_writer'
-require_relative '../evaluation'
+require_relative '../../../precompile/buffer_writer'
+require_relative '../../../precompile/evaluation'
 # TextPreprocessor
 class TextPreprocessor
   def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)

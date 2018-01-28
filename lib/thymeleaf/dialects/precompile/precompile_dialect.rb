@@ -1,4 +1,4 @@
-require_relative '../dialects/dialect'
+require_relative '../dialect'
 class PrecompileDialect < Dialect
   CONTEXT_SWITCH_VAR   = 'switch_var'.freeze
   CONTEXT_FRAGMENT_VAR = 'fragment_var'.freeze
@@ -37,13 +37,13 @@ class PrecompileDialect < Dialect
     }
   end
 
-  require_relative 'precompile_processors/if_preprocessor'
-  require_relative 'precompile_processors/text_preprocessor'
-  require_relative 'precompile_processors/utext_preprocessor'
-  require_relative 'precompile_processors/unless_preprocessor'
-  require_relative 'precompile_processors/case_preprocessor'
-  require_relative 'precompile_processors/switch_preprocessor'
-  require_relative 'precompile_processors/block_preprocessor'
-  require_relative 'precompile_processors/default_preprocessor'
-  require_relative 'precompile_processors/object_preprocessor'
+  require_relative 'processors/if'
+  require_relative 'processors/text'
+  require_relative 'processors/utext'
+  require_relative 'processors/unless'
+  require_relative 'processors/case'
+  require_relative 'processors/switch'
+  require_relative 'processors/block'
+  require_relative 'processors/default'
+  require_relative 'processors/object'
 end
