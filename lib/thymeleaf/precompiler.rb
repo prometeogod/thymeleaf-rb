@@ -1,8 +1,8 @@
-require_relative './precompile_buffer'
-require_relative './buffer_writer'
-require_relative '../../thymeleaf'
-require_relative './writer'
-require_relative '../utils/attributes_utils'
+require_relative 'precompile/precompile_buffer'
+require_relative 'precompile/buffer_writer'
+require_relative '../thymeleaf'
+require_relative 'precompile/writer'
+require_relative 'utils/attributes_utils'
 # class Precompiler : implements the mechanism that precompiles parsed templates
 class Precompiler
   def precompile (parsed_tree)
