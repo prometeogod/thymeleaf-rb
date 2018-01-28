@@ -19,15 +19,14 @@ module Thymeleaf
   end
   # Configuration class definition : Configures the template engine
   class Configuration
-    attr_accessor :dialects, :template, :parser, :cache_manager, :pre_cache
+    attr_accessor :dialects, :template, :parser, :pre_cache
     def initialize
-      self.cache_manager = CacheManager.new
       self.pre_cache = Store.new
       self.dialects = Dialects.new
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new
-      add_dialect DefaultDialect
-      #add_dialect PrecompileDialect
+      #add_dialect DefaultDialect
+      add_dialect PrecompileDialect
     end
 
     def add_dialect(*args)
