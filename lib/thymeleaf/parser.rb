@@ -13,7 +13,7 @@ module Thymeleaf
       # else
       #   Oga.sax_parse_html(handler, template_markup)
       # end
-      handler
+      handler.nodes
     end
   end
 end
