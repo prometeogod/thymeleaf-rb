@@ -1,57 +1,47 @@
-require_relative 'precompile/precompiler'
 require_relative 'precompile/writer'
 require_relative 'precompile/expresion'
 require_relative 'context/context_holder'
-require_relative './cache/node_value_date'
 require_relative 'processor'
-require_relative './utils/name_parser'
-
 
 module Thymeleaf
+  # Class Template
   class Template < Struct.new(:template_markup, :context)
-    def render(filename = nil)
-      do_render template_markup, filename
-    end
-
-    def render_file
-      configuration = Thymeleaf.configuration
-      template_markup_uri = configuration.template_uri(template_markup)
-      template_file_open template_markup_uri do |template|
-        do_render template, template_markup_uri
-      end
+    def render
+      precompiled_template = precompiled_template(template_key(template_markup), template_markup)
+      output_template(context, Writer.new, Expression.new, precompiled_template)
     end
 
     private
 
-    def do_render(template, filename=nil)
-      
-      dig = Digest::SHA1.hexdigest(template)
-      
-      precompiled_template = Thymeleaf.configuration.pre_cache.get(dig)
-      if !precompiled_template
-        handler = Thymeleaf::Parser.new(template).call
-        parsed_template = handler.nodes
-        precompiled_template = precompile(parsed_template) #Es un lambda
-        Thymeleaf.configuration.pre_cache.set(dig, precompiled_template)
-      end
-      w = StringWriter.new
-      precompiled_template.call(context, w, Expr.new)
-      w.output
+    def template_key(template)
+      Thymeleaf::TemplateKey.new(template).key
     end
 
-    def precompile(parsed_tree)
-      precompiled_template = Precompiler.new.precompile(parsed_tree) #Es un lambda
-      eval(precompiled_template)
+    def parsed_template(template)
+      Thymeleaf::Parser.new(template).call
     end
 
-    # Template file open
-
-    def template_file_open(template_file)
-      File.open template_file do |template|
-        template.rewind
-        yield template.read
-      end
+    def precompile(parsed_template)
+      Thymeleaf::Precompiler.new(parsed_template).precompile
     end
 
+    def precompiled_template_from_cache(template_key)
+      Thymeleaf.configuration.precompile_cache.get(template_key)
+    end
+
+    def fetch_precompiled_template(template_key, template)
+      precompiled_template = precompile(parsed_template(template))
+      Thymeleaf.configuration.precompile_cache.set(template_key, precompiled_template)
+      precompiled_template
+    end
+
+    def precompiled_template(template_key, template)
+      precompiled_template_from_cache(template_key) || fetch_precompiled_template(template_key, template)
+    end
+
+    def output_template(context, writer, expression, template)
+      template.call(context, writer, expression)
+      writer.output
+    end
   end
 end
