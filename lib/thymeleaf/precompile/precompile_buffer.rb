@@ -6,7 +6,7 @@ class PrecompileBuffer
   end
 
   def write(string)
-    self.buffer << string
+    self.buffer << "#{string}\n"
   end
 
   def flush
