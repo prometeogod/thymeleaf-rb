@@ -1,19 +1,16 @@
 class DefaultPreprocessor
   def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)
   	if pos == 1
-  	  BufferWriter.write_node_head(node, buffer)
-  	  BufferWriter.write_newline(buffer)
+  	  BufferWriter.begin_tag(buffer, node)
   	  BufferWriter.write buffer, 'begin'
-  	  BufferWriter.write_newline(buffer)
     end
     if pos == length
       if !node.children.empty?
-        precompiler = Precompiler.new
+        precompiler = Thymeleaf::Precompiler.new
         precompiler.precompile_children(node.children, buffer)
       end
-      BufferWriter.write_node_tail(node, buffer)
+      BufferWriter.end_tag(buffer, node)
       BufferWriter.write buffer, 'end'
-      BufferWriter.write_newline(buffer)
     end
   end
 end

@@ -8,18 +8,15 @@ class CasePreprocessor
     else
       BufferWriter.write buffer, 'when ' + '"' + expr + '"' 
     end
-    BufferWriter.write_newline(buffer)
     BufferWriter.write buffer, 'begin'
-    BufferWriter.write_newline(buffer)
-    BufferWriter.write_node_head(node, buffer) if pos == 1
+    BufferWriter.begin_tag(buffer, node) if pos == 1
     if pos == length
       if !node.children.empty?
-        precompiler = Precompiler.new
+        precompiler = Thymeleaf::Precompiler.new
         precompiler.precompile_children(node.children, buffer)
       end
-      BufferWriter.write_node_tail(node, buffer)
+      BufferWriter.end_tag(buffer, node)
       BufferWriter.write buffer, 'end'
-      BufferWriter.write_newline(buffer)
     end
   end
 end

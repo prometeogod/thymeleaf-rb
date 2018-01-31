@@ -1,20 +1,18 @@
 require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
-require_relative '../../../precompiler'
+require_relative '../../../../../lib/thymeleaf'
 class IfPreprocessor
   def call(node: nil, buffer: nil, attribute: nil, pos: nil, length:nil, object: nil)
     evaluable, expr = Evaluation.evalue(attribute)
     BufferWriter.write buffer, 'if ' + ' booleanize '+ 'expresion.call(context,'+'"' +expr+'"' + ').to_s'
-    BufferWriter.write_newline(buffer)
-    BufferWriter.write_node_head(node, buffer) if pos == 1
+    BufferWriter.begin_tag(buffer, node) if pos == 1
     if pos == length
       if !node.children.empty?
-        precompiler = Precompiler.new
+        precompiler = Thymeleaf::Precompiler.new
         precompiler.precompile_children(node.children, buffer)
       end
-      BufferWriter.write_node_tail(node, buffer)
+      BufferWriter.end_tag(buffer, node)
       BufferWriter.write buffer, 'end'
-      BufferWriter.write_newline(buffer)
     end
   end
 end

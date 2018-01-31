@@ -5,7 +5,7 @@ class TextPreprocessor
   def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)
     # Header
     if pos == 1
-      BufferWriter.write_node_head(node, buffer)
+      BufferWriter.begin_tag(buffer, node)
     end
     # Body
     evaluable, expr = Evaluation.evalue(attribute)
@@ -20,12 +20,10 @@ class TextPreprocessor
         BufferWriter.write buffer, 'writer.write ' + 'Oga::XML::Entities.encode('+ '"' + expr + '"' + ')'
       end
     end
-    BufferWriter.write_newline(buffer)
     # Tail
     if pos == length
-      BufferWriter.write_node_tail(node, buffer)
+      BufferWriter.end_tag(buffer, node)
       BufferWriter.write buffer, 'end' if pos != 1
-      BufferWriter.write_newline(buffer)
     end
   end
 end

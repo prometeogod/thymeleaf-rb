@@ -4,11 +4,16 @@ require_relative '../thymeleaf'
 require_relative 'precompile/writer'
 require_relative 'utils/attributes_utils'
 # class Precompiler : implements the mechanism that precompiles parsed templates
+module Thymeleaf
 class Precompiler
-  def precompile (parsed_tree)
+  attr_accessor :parsed_template
+  def initialize(parsed_template = nil)
+    @parsed_template = parsed_template
+  end
+  def precompile
     buffer = PrecompileBuffer.new
-    BufferWriter.write_initial_declaration(buffer, '->(context, writer, expresion)')
-    parsed_tree.each do |node|
+    BufferWriter.initial_declaration(buffer, '->(context, writer, expresion)')
+    parsed_template.each do |node|
       if key_word?(node.name)
         precompile_with_keyword(node, buffer)
       else
@@ -17,7 +22,7 @@ class Precompiler
     end
     BufferWriter.write_final_declaration(buffer)
     puts fl = buffer.flush
-    fl
+    eval(fl) # 
   end
 
   def precompile_children(children, buffer, object = nil)
@@ -47,9 +52,9 @@ class Precompiler
   def precompile_keyword(node, buffer)
     case node.name
     when 'text-content'
-      BufferWriter.write_text_node(node, buffer)
+      BufferWriter.text_content(buffer, node)
     when 'comment'
-      BufferWriter.write_comment_node(node, buffer)
+      BufferWriter.comment_content(buffer, node)
     when 'doctype'
       buffer.write 'print '+ 'String.new(' + '\''+ node.attributes.to_s + '\'' + ')'
     when 'meta'
@@ -65,15 +70,13 @@ class Precompiler
       if !node.attributes.empty?
         process_attributes(node, buffer, object)
       else     
-        BufferWriter.write_node_head(node, buffer)
+        BufferWriter.begin_tag(buffer, node)
         if !node.children.empty?
           precompile_children(node.children, buffer, object)
         end
-        BufferWriter.write_node_tail(node, buffer)
+        BufferWriter.end_tag(buffer, node)
       end
     end
-    
-    # The own node needs to decide if process their childs
   end
 
   def process_attributes(node, buffer, object=nil)
@@ -110,4 +113,5 @@ class Precompiler
     key, processor = * dialects.find_tag_processor(node_name)
     processor
   end
+end
 end
