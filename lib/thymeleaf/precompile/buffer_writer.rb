@@ -1,37 +1,53 @@
 # class BufferWriter : it write standard strings into a buffer
 require_relative '../utils/attributes_utils'
 class BufferWriter
-  def self.begin_tag(buffer, node)
-    reg_attrs = select_regular(node.attributes)
-    s_reg_attr = to_string_regular_attributes(reg_attrs)
-  	buffer.write "writer.write \'<#{node.name + s_reg_attr}>\'" 
+  def initialize(buffer)
+    @buffer = buffer
   end
 
-  def self.end_tag(buffer, node)
-  	buffer.write "writer.write \'<#{node.name}>\'"
-  end
-
-  def self.text_content(buffer, node)
-    buffer.write "writer.write \'#{node.attributes.to_s}\'"
-  end
-  
-  def self.comment_content(buffer, node)
-    buffer.write "writer.write \'<!--#{node.attributes}-->\'"
-  end
-
-  def self.initial_declaration(buffer, declaration)
-    buffer.write "#{declaration}{"
-  end
-
-  def self.write_final_declaration(buffer)
-    buffer.write "}"
-  end
-
-  def self.write_newline(buffer)
-    buffer.write ""
-  end
-
-  def self.write(buffer, statement)
+  def write(statement)
     buffer.write statement
   end
+
+  def begin_tag(node)
+    reg_attrs = select_regular(node.attributes)
+    s_reg_attr = to_string_regular_attributes(reg_attrs)
+    write "writer.write \'<#{node.name + s_reg_attr}>\'" 
+  end
+
+  def end_tag(node)
+    write "writer.write \'<#{node.name}>\'"
+  end
+
+  def text_content(node)
+    write "writer.write \'#{node.attributes.to_s}\'"
+  end
+
+  def comment_content(node)
+    write "writer.write \'<!--#{node.attributes}-->\'"
+  end
+  
+  def initial_declaration(declaration)
+    write "#{declaration}{"
+  end
+
+  def begining
+    write "begin"
+  end
+  
+  def ending
+    write "end"
+  end
+
+  def final_declaration
+    write "}"
+  end
+
+  def newline
+    write ""
+  end
+
+  private 
+
+  attr_accessor :buffer
 end

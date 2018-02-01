@@ -1,22 +1,22 @@
 require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 class CasePreprocessor
-  def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  def call(node: nil, buffer: nil, buffer_writer: nil, attribute: nil, pos: nil, length: nil, object: nil)
     evaluable, expr = Evaluation.evalue(attribute)
     if evaluable
-      BufferWriter.write buffer, 'when ' + 'expresion.call(context,'+'"' +expr+'"' + ')' 
+      buffer_writer.write "when expresion.call(context,#{expr})" 
     else
-      BufferWriter.write buffer, 'when ' + '"' + expr + '"' 
+      buffer_writer.write "when \"#{expr}\"" 
     end
-    BufferWriter.write buffer, 'begin'
-    BufferWriter.begin_tag(buffer, node) if pos == 1
+    buffer_writer.begining
+    buffer_writer.begin_tag(node) if pos == 1
     if pos == length
       if !node.children.empty?
         precompiler = Thymeleaf::Precompiler.new
-        precompiler.precompile_children(node.children, buffer)
+        precompiler.precompile_children(node.children, buffer, buffer_writer)
       end
-      BufferWriter.end_tag(buffer, node)
-      BufferWriter.write buffer, 'end'
+      buffer_writer.end_tag(node)
+      buffer_writer.ending
     end
   end
 end

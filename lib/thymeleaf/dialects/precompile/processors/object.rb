@@ -3,17 +3,17 @@ require_relative '../../../precompile/evaluation'
 require_relative '../../../../../lib/thymeleaf'
 require_relative '../precompile_dialect'
 class ObjectPreprocessor
-  def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  def call(node: nil, buffer: nil, buffer_writer: nil, attribute: nil, pos: nil, length: nil, object: nil)
     evaluable, expr = Evaluation.evalue(attribute)
     context_var = PrecompileDialect::CONTEXT_OBJECT_VAR
-    BufferWriter.write buffer, context_var + ' = '+ 'expresion.call(context,'+'"' +expr+'"' + ')'
-    BufferWriter.begin_tag(buffer, node) if pos == 1
+    buffer_writer.write "#{context_var} = expresion.call(context,\'#{expr}\')"
+    buffer_writer.begin_tag(node) if pos == 1
     if pos == length
       if !node.children.empty?
         precompiler = Thymeleaf::Precompiler.new
-        precompiler.precompile_children(node.children, buffer, context_var)
+        precompiler.precompile_children(node.children, buffer, buffer_writer, context_var)
       end
-      BufferWriter.end_tag(buffer, node)
+      buffer_writer.end_tag(node)
     end
   end
 end

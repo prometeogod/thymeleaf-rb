@@ -2,15 +2,15 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 require_relative '../../../../../lib/thymeleaf'
 class SwitchPreprocessor
-  def call(node: nil, buffer: nil, attribute: nil, pos: nil, length: nil, object: nil)
-  	BufferWriter.begin_tag(buffer, node)
+  def call(node: nil, buffer: nil, buffer_writer: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  	buffer_writer.begin_tag(node)
   	evaluable, expr = Evaluation.evalue(attribute)
-  	BufferWriter.write buffer, 'case '+'expresion.call(context,'+'"' +expr+'"' + ')'
+  	buffer_writer.write "case expresion.call(context,\'#{expr}\')"
   	if !node.children.empty?
       precompiler = Thymeleaf::Precompiler.new
-      precompiler.precompile_notext_children(node.children, buffer)
+      precompiler.precompile_notext_children(node.children, buffer, buffer_writer)
     end
-    BufferWriter.write buffer, 'end'
-    BufferWriter.end_tag(buffer, node)
+    buffer_writer.ending
+    buffer_writer.end_tag(node)
   end
 end
