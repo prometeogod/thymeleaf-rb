@@ -2,7 +2,7 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 # TextPreprocessor
 class TextPreprocessor
-  def call(node: nil, buffer: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  def call(node: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
     # Header
     if pos == 1
       buffer_writer.begin_tag(node)
