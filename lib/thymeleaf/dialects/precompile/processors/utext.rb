@@ -2,9 +2,10 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 # UTextProcessor
 class UTextPreprocessor
-  def call(node: nil, buffer: nil, buffer_writer: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  def call(node: nil, buffer: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
     buffer_writer.begin_tag(node) if pos == 1
     evaluable, expr = Evaluation.evalue(attribute)
+    #buffer_writer.write "writer.write EvalExpression.parse(context,\'#{attribute}\')"
     if evaluable
       buffer_writer.write "writer.write expresion.call(context,\'#{expr}\').to_s"
     else

@@ -2,12 +2,13 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 # TextPreprocessor
 class TextPreprocessor
-  def call(node: nil, buffer: nil, buffer_writer: nil, attribute: nil, pos: nil, length: nil, object: nil)
+  def call(node: nil, buffer: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
     # Header
     if pos == 1
       buffer_writer.begin_tag(node)
     end
     # Body
+    #buffer_writer.write "writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,\'#{attribute}\'))"
     evaluable, expr = Evaluation.evalue(attribute)
     if object
        object_expr = Evaluation.asterisk_object(expr, object) # TODO no me gusta este metodo
