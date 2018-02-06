@@ -4,14 +4,18 @@ class Writer
   end
 
   def write(x)
-    @buffer << x
+    buffer << x
   end
     
   def <<(x)
-    @buffer << x
+    buffer << x
   end
 	
   def output
-    @buffer.join
+    buffer.join
   end
+  
+  private 
+
+  attr_accessor :buffer
 end

@@ -1,15 +1,17 @@
 class PrecompileBuffer
-  attr_accessor :buffer
-
   def initialize
-    self.buffer = []
+    @buffer = []
   end
 
   def write(string)
-    self.buffer << "#{string}\n"
+    buffer << "#{string}\n"
   end
 
   def flush
   	buffer.join
   end
+
+  private
+
+  attr_accessor :buffer
 end

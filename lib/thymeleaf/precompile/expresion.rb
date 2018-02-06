@@ -1,5 +1,5 @@
-class Expr
+class Expression
 	def call(ctx, expr)
-      ctx[expr] # Poner to_s si tiene que devolver un string
+      ctx[expr]
 	end
 end
