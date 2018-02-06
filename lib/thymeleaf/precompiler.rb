@@ -2,45 +2,30 @@ require_relative 'precompile/precompile_buffer'
 require_relative 'precompile/buffer_writer'
 require_relative '../thymeleaf'
 require_relative 'precompile/writer'
-require_relative 'utils/attributes_utils'
+require_relative 'attributes'
 # class Precompiler : implements the mechanism that precompiles parsed templates
 module Thymeleaf
 class Precompiler
-  
   def initialize(parsed_template = nil)
     @parsed_template = parsed_template
   end
+
   def precompile
     buffer = PrecompileBuffer.new
     buffer_writer = BufferWriter.new(buffer)
     buffer_writer.initial_declaration('->(context, writer, expresion)')
-    parsed_template.each do |node|
-      if key_word?(node.name)
-        precompile_with_keyword(node, buffer_writer)
-      else
-        precompile_node(node, buffer_writer)
-      end
-    end
+    precompile_template(parsed_template, buffer_writer)
     buffer_writer.final_declaration
-    puts fl = buffer.flush
-    eval(fl) # 
+    eval_buffer(buffer)
   end
 
   def precompile_children(children, buffer_writer, object = nil)
-    children.each do |child|
-      if key_word?(child.name)
-        precompile_with_keyword(child, buffer_writer)
-      else
-        precompile_node(child, buffer_writer, object)
-      end
-    end
+    precompile_template(children, buffer_writer, object)
   end
 
   def precompile_notext_children(children, buffer_writer)
     children.each do |child|
-      if !key_word?(child.name)
-        precompile_node(child, buffer_writer)
-      end
+      precompile_node(child, buffer_writer) unless key_word?(child.name)
     end
   end
   
@@ -48,6 +33,17 @@ class Precompiler
 
   attr_accessor :parsed_template
   
+  def eval_buffer(buffer)
+    puts fl = buffer.flush
+    eval(fl)
+  end
+ 
+  def precompile_template(template, buffer_writer, object = nil)
+    template.each do |node|
+      key_word?(node.name) ? precompile_with_keyword(node, buffer_writer) : precompile_node(node, buffer_writer, object)
+    end 
+  end
+
   def precompile_with_keyword(node, buffer_writer)
     precompile_keyword(node, buffer_writer)
   end
@@ -66,27 +62,25 @@ class Precompiler
   end
 
   def precompile_node(node, buffer_writer, object = nil)
-    # First we process the attributes
-    if node.name.match(/th-^*/) # Detecta si es procesar el tag
-        process_tag(node, buffer, buffer_writer)
-    else
-      if !node.attributes.empty?
-        process_attributes(node, buffer_writer, object)
-      else     
-        buffer_writer.begin_tag(node)
-        if !node.children.empty?
-          precompile_children(node.children, buffer_writer, object)
-        end
-        buffer_writer.end_tag(node)
-      end
-    end
+    node.name.match(/th-^*/) ? process_tag(node, buffer_writer) : process_attributes(node, buffer_writer, object)
   end
 
   def process_attributes(node, buffer_writer, object=nil)
+    node.attributes.empty? ?  process_html_attributes(node, buffer_writer, object)  : process_dialected_attributes(node, buffer_writer, object)
+  end
+
+  def process_html_attributes(node, buffer_writer, object= nil)
+    buffer_writer.begin_tag(node)
+    precompile_children(node.children, buffer_writer, object) if node.children.any?
+    buffer_writer.end_tag(node)
+  end
+
+  def process_dialected_attributes(node, buffer_writer, object=nil)
     pos = 0
-    length = length_th(node.attributes)
+    attribute_utils = Attributes.new
+    length = attribute_utils.length_th(node.attributes)
     node.attributes.each do |attribute_key, attribute|
-      processor = find_processor(attribute_key)
+      processor = find_attr_processor(attribute_key)
       if processor
         pos += 1 if processor.class != NullPreprocessor
         process_element(processor, node, buffer_writer, attribute, pos, length, object)
@@ -96,16 +90,14 @@ class Precompiler
 
   def process_tag(node, buffer_writer)
     processor = find_tag_processor(node.name)
-    if processor
-      process_element(processor, node, buffer_writer, nil, nil, nil)
-    end
+    process_element(processor, node, buffer_writer, nil, nil, nil) if processor
   end
 
   def process_element(processor, node, buffer_writer, attribute, pos, length, object = nil)
     processor.call(node: node, buffer_writer: buffer_writer, precompiler: self, attribute: attribute, pos: pos, length: length, object: object)
   end
 
-  def find_processor(attribute_key)
+  def find_attr_processor(attribute_key)
     dialects = Thymeleaf.configuration.dialects
     key, processor = * dialects.find_attr_processor(attribute_key)
     processor
