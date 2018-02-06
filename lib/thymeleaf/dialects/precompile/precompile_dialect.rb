@@ -3,6 +3,7 @@ class PrecompileDialect < Dialect
   CONTEXT_SWITCH_VAR   = 'switch_var'.freeze
   CONTEXT_FRAGMENT_VAR = 'fragment_var'.freeze
   CONTEXT_OBJECT_VAR   = 'context_obj'.freeze
+  EACH_ELEMENT = 'each_element'.freeze
 
   def self.default_key
     'th'
@@ -24,7 +25,7 @@ class PrecompileDialect < Dialect
       #insert:   InsertProcessor,
       #replace:  ReplaceProcessor,
       #fragment: FragmentProcessor,
-      #each:     EachProcessor,
+      each:     EachPreprocessor,
       if:       IfPreprocessor,
       unless:   UnlessPreprocessor,
       switch:   SwitchPreprocessor,
@@ -46,4 +47,5 @@ class PrecompileDialect < Dialect
   require_relative 'processors/block'
   require_relative 'processors/default'
   require_relative 'processors/object'
+  require_relative 'processors/each'
 end

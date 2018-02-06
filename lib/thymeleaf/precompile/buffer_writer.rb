@@ -1,5 +1,5 @@
 # class BufferWriter : it write standard strings into a buffer
-require_relative '../utils/attributes_utils'
+require_relative '../attributes'
 class BufferWriter
   def initialize(buffer)
     @buffer = buffer
@@ -10,13 +10,14 @@ class BufferWriter
   end
 
   def begin_tag(node)
-    reg_attrs = select_regular(node.attributes)
-    s_reg_attr = to_string_regular_attributes(reg_attrs)
-    write "writer.write \'<#{node.name + s_reg_attr}>\'" 
+    attribute_utils = Attributes.new
+    html_attributes = attribute_utils.select_html_attributes(node.attributes)
+    string_reg = attribute_utils.to_string_regular_attributes(html_attributes)
+    write "writer.write \'<#{node.name + string_reg}>\'" 
   end
 
   def end_tag(node)
-    write "writer.write \'<#{node.name}>\'"
+    write "writer.write \'<\\#{node.name}>\'"
   end
 
   def text_content(node)

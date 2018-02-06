@@ -8,7 +8,7 @@ class TextPreprocessor
       buffer_writer.begin_tag(node)
     end
     # Body
-    #buffer_writer.write "writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,\'#{attribute}\'))"
+    #buffer_writer.write "writer.write Oga::XML::Entities.encode(EvalExpression.parse(ContextHolder.new(context),\'#{attribute}\'))"
     evaluable, expr = Evaluation.evalue(attribute)
     if object
        object_expr = Evaluation.asterisk_object(expr, object) # TODO no me gusta este metodo
