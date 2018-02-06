@@ -1,9 +1,8 @@
 require_relative 'dialects'
 require_relative 'dialects/default/default_dialect'
-require_relative 'precompile/precompile_dialect'
+require_relative 'dialects/precompile/precompile_dialect'
 require_relative 'template/template_resolver'
 require_relative 'parser/parse_options'
-require_relative 'cache/cache_manager'
 require_relative 'cache/store'
 # Thymeleaf module
 module Thymeleaf
@@ -19,9 +18,9 @@ module Thymeleaf
   end
   # Configuration class definition : Configures the template engine
   class Configuration
-    attr_accessor :dialects, :template, :parser, :pre_cache
+    attr_accessor :dialects, :template, :parser, :precompile_cache
     def initialize
-      self.pre_cache = Store.new
+      self.precompile_cache = Store.new
       self.dialects = Dialects.new
       self.template = TemplateResolver.new
       self.parser   = ParseOptions.new
