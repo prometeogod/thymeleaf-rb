@@ -1,3 +1,4 @@
+require 'digest'
 module Thymeleaf
   class TemplateKey
   	attr_reader :key

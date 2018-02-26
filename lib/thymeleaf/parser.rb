@@ -7,12 +7,6 @@ module Thymeleaf
     def call
       handler = SaxHandler.new
       Oga.sax_parse_html(handler, template_markup)
-      # regexp=@r{/^\s*(?:\s*<!--[^>]*-->)*\s*<(?:html|!doctype)/i}
-      # if regexp.match(template_markup)
-      #   Oga.sax_parse_html(handler, template_markup)
-      # else
-      #   Oga.sax_parse_html(handler, template_markup)
-      # end
       handler.nodes
     end
   end

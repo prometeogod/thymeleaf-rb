@@ -70,7 +70,7 @@ module ThymeleafTest
     def render_test
       th_template = self.th_template
       context = self.context
-      Thymeleaf::Template.new(th_template, context).render(test_path)
+      Thymeleaf::Template.new(th_template, context).render
     end
 
     private
