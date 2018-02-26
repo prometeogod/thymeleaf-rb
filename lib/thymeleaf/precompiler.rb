@@ -2,111 +2,101 @@ require_relative 'precompile/precompile_buffer'
 require_relative 'precompile/buffer_writer'
 require_relative '../thymeleaf'
 require_relative 'precompile/writer'
-require_relative 'attributes'
+require_relative 'instructions'
+require_relative 'node_instruction'
 # class Precompiler : implements the mechanism that precompiles parsed templates
 module Thymeleaf
-class Precompiler
-  def initialize(parsed_template = nil)
-    @parsed_template = parsed_template
-  end
-
-  def precompile
-    buffer = PrecompileBuffer.new
-    buffer_writer = BufferWriter.new(buffer)
-    buffer_writer.initial_declaration('->(context, writer, expresion)')
-    precompile_template(parsed_template, buffer_writer)
-    buffer_writer.final_declaration
-    eval_buffer(buffer)
-  end
-
-  def precompile_children(children, buffer_writer, object = nil)
-    precompile_template(children, buffer_writer, object)
-  end
-
-  def precompile_notext_children(children, buffer_writer)
-    children.each do |child|
-      precompile_node(child, buffer_writer) unless key_word?(child.name)
+  class Precompiler
+    def initialize(parsed_template = nil)
+      @parsed_template = parsed_template
     end
-  end
-  
-  private 
 
-  attr_accessor :parsed_template
-  
-  def eval_buffer(buffer)
-    puts fl = buffer.flush
-    eval(fl)
-  end
- 
-  def precompile_template(template, buffer_writer, object = nil)
-    template.each do |node|
-      key_word?(node.name) ? precompile_with_keyword(node, buffer_writer) : precompile_node(node, buffer_writer, object)
-    end 
-  end
-
-  def precompile_with_keyword(node, buffer_writer)
-    precompile_keyword(node, buffer_writer)
-  end
-
-  def precompile_keyword(node, buffer_writer)
-    case node.name
-    when 'text-content'
-      buffer_writer.text_content(node)
-    when 'comment'
-      buffer_writer.comment_content(node)
-    when 'doctype'
-      
-    when 'meta'
-      
+    def precompile
+      eval_function(template_function)
     end
-  end
 
-  def precompile_node(node, buffer_writer, object = nil)
-    node.name.match(/th-^*/) ? process_tag(node, buffer_writer) : process_attributes(node, buffer_writer, object)
-  end
+    private 
 
-  def process_attributes(node, buffer_writer, object=nil)
-    node.attributes.empty? ?  process_html_attributes(node, buffer_writer, object)  : process_dialected_attributes(node, buffer_writer, object)
-  end
+    attr_accessor :parsed_template
 
-  def process_html_attributes(node, buffer_writer, object= nil)
-    buffer_writer.begin_tag(node)
-    precompile_children(node.children, buffer_writer, object) if node.children.any?
-    buffer_writer.end_tag(node)
-  end
+    def template_function
+      buffer = PrecompileBuffer.new
+      buffer_writer = BufferWriter.new
+      root_node = root_node(buffer_writer)
+      process_nodes(parsed_template, root_node, buffer_writer)
+      root_node.to_buffer(buffer)
+      buffer.flush
+    end
+  
+    def root_node(buffer_writer)
+      initial_instruction = buffer_writer.initial_declaration('->(context, writer, expresion, formatter)')
+      final_instruction = buffer_writer.final_declaration
+      instruction = Instruction.new(initial_instruction, final_instruction)
+      instructions = Instructions.new
+      instructions.especial_instructions << instruction
+      NodeInstruction.new(instructions)
+    end
 
-  def process_dialected_attributes(node, buffer_writer, object=nil)
-    pos = 0
-    attribute_utils = Attributes.new
-    length = attribute_utils.length_th(node.attributes)
-    node.attributes.each do |attribute_key, attribute|
-      processor = find_attr_processor(attribute_key)
-      if processor
-        pos += 1 if processor.class != NullPreprocessor
-        process_element(processor, node, buffer_writer, attribute, pos, length, object)
+    def eval_function(function)
+      eval(function)
+    end
+  
+    def process_nodes(nodes, parent_instruction, buffer_writer)
+      nodes.each do |node|
+        node_instruction = NodeInstruction.new
+        parent_instruction.add_child(node_instruction)
+        process_node(node, node_instruction, parent_instruction, buffer_writer)
       end
     end
-  end
 
-  def process_tag(node, buffer_writer)
-    processor = find_tag_processor(node.name)
-    process_element(processor, node, buffer_writer, nil, nil, nil) if processor
-  end
+    def process_node(node, node_instruction, parent_instruction, buffer_writer)
+      if key_word?(node.name)
+        process_especial_node(node, node_instruction, parent_instruction, buffer_writer)
+      else
+        process_normal_node(node, node_instruction, parent_instruction, buffer_writer)
+      end      
+    end
+  
+    def process_especial_node(node, node_instruction, parent_instruction, buffer_writer)
+      case node.name
+      when 'text-content'
+        instruction = Instruction.new(buffer_writer.text_content(node))
+      when 'comment'
+        instruction = Instruction.new(buffer_writer.comment_content(node))
+      when 'doctype'
+      
+      when 'meta'
+      
+      end
+      node_instruction.instructions.especial_instructions << instruction
+    end
+  
+    def process_normal_node(node, node_instruction, parent_instruction, buffer_writer)
+      process_attributes(node, node_instruction, parent_instruction, buffer_writer)
+      process_tag(node, node_instruction, parent_instruction, buffer_writer)
+      process_nodes(node.children, node_instruction, buffer_writer)
+    end
 
-  def process_element(processor, node, buffer_writer, attribute, pos, length, object = nil)
-    processor.call(node: node, buffer_writer: buffer_writer, precompiler: self, attribute: attribute, pos: pos, length: length, object: object)
-  end
+    def process_attributes(node,node_instruction, parent_instruction, buffer_writer)
+      node.attributes.each do |attribute_key, attribute|
+        process_attribute(node, node_instruction, parent_instruction, buffer_writer, attribute_key, attribute)
+      end
+    end
 
-  def find_attr_processor(attribute_key)
-    dialects = Thymeleaf.configuration.dialects
-    key, processor = * dialects.find_attr_processor(attribute_key)
-    processor
-  end
+    def process_attribute(node, node_instruction, parent_instruction, buffer_writer, attribute_key, attribute)
+      dialects = Thymeleaf.configuration.dialects
+      key, processor = * dialects.find_attr_processor(attribute_key)
+      process_element(node, node_instruction, parent_instruction, buffer_writer, attribute, key, processor)
+    end
+  
+    def process_tag(node, node_instruction, parent_instruction, buffer_writer)
+      dialects = Thymeleaf.configuration.dialects
+      key, processor = * dialects.find_tag_processor(node.name)
+      process_element(node,node_instruction, parent_instruction, buffer_writer, nil, key, processor)
+    end
 
-  def find_tag_processor(node_name)
-    dialects = Thymeleaf.configuration.dialects
-    key, processor = * dialects.find_tag_processor(node_name)
-    processor
+    def process_element(node, node_instruction, parent_instruction, buffer_writer, attribute, key, processor)
+      processor.call(node: node, node_instruction: node_instruction, parent_instruction: parent_instruction, buffer_writer: buffer_writer, attribute: attribute, key: key)
+    end
   end
-end
 end

@@ -2,13 +2,14 @@ require_relative 'precompile/writer'
 require_relative 'precompile/expresion'
 require_relative 'context/context_holder'
 require_relative 'processor'
+require_relative 'formatter'
 
 module Thymeleaf
-  # Class Template
+  # Class Template :
   class Template < Struct.new(:template_markup, :context)
     def render
       precompiled_template = precompiled_template(template_key(template_markup), template_markup)
-      output_template(context, Writer.new, Expression.new, precompiled_template)
+      output_template(context, Writer.new, Expression.new, Formatter.new, precompiled_template)
     end
 
     private
@@ -39,8 +40,8 @@ module Thymeleaf
       precompiled_template_from_cache(template_key) || fetch_precompiled_template(template_key, template)
     end
 
-    def output_template(context, writer, expression, template)
-      template.call(context, writer, expression)
+    def output_template(context, writer, expression, formatter, template)
+      template.call(ContextHolder.new(context), writer, expression, formatter)
       writer.output
     end
   end
