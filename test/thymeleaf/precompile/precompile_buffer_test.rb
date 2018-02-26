@@ -7,13 +7,13 @@ describe PrecompileBuffer do
   end
 
   it 'should be empty' do 
-    assert_equal @buffer.buffer, []
+    assert_equal @buffer.empty?, true
   end
 
   it 'should write something' do
     something = '<something>'
     @buffer.write(something)
-    assert_equal @buffer.buffer.count, 1
-    assert_equal @buffer.buffer[0], '<something>'
+    assert_equal @buffer.length, 1
+    assert_equal @buffer.flush, "<something>\n"
   end
 end 

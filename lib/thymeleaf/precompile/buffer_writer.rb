@@ -1,54 +1,71 @@
 # class BufferWriter : it write standard strings into a buffer
-require_relative '../attributes'
 class BufferWriter
-  def initialize(buffer)
-    @buffer = buffer
-  end
 
   def write(statement)
-    buffer.write statement
+    "writer.write #{statement}"
   end
 
   def begin_tag(node)
-    attribute_utils = Attributes.new
-    html_attributes = attribute_utils.select_html_attributes(node.attributes)
-    string_reg = attribute_utils.to_string_regular_attributes(html_attributes)
-    write "writer.write \'<#{node.name + string_reg}>\'" 
+    write "\'<#{node.name}\' + formatter.attributes_string(attributes) + \'>\'"
   end
 
+  def pretty_tag(node)
+    write "\'<#{node.name}\' + formatter.attributes_string(attributes) + \'/>\'"
+  end
+  
   def end_tag(node)
-    write "writer.write \'<\\#{node.name}>\'"
+    write "\'</#{node.name}>\'"
   end
 
   def text_content(node)
-    write "writer.write \'#{node.attributes.to_s}\'"
+    write "\'#{node.attributes.to_s}\'"
   end
 
   def comment_content(node)
-    write "writer.write \'<!--#{node.attributes}-->\'"
+    write"\'<!--#{node.attributes}-->\'"
   end
   
   def initial_declaration(declaration)
-    write "#{declaration}{"
+    "#{declaration}{"
   end
 
   def begining
-    write "begin"
+    "begin"
   end
   
   def ending
-    write "end"
+    "end"
   end
 
   def final_declaration
-    write "}"
+    "}"
   end
 
   def newline
-    write ""
+    ""
   end
 
-  private 
+  def if_statement(attribute)
+    "if booleanize EvalExpression.parse(context, \'#{attribute}\')"
+  end
 
-  attr_accessor :buffer
+  def unless_statement(attribute)
+    "unless booleanize EvalExpression.parse(context, \'#{attribute}\')"
+  end
+
+  def switch_statement(attribute, switch_var)
+    "#{switch_var} = EvalExpression.parse(context, \'#{attribute}\')"
+  end
+
+  def case_statement(attribute, switch_var)
+    "if #{switch_var}.eql?(EvalExpression.parse(case_context, \'#{attribute}\'))"
+  end
+
+  def attributes_statement(node)
+    "attributes = #{node.attributes}.to_a.join(\' \')"
+  end
+
+  def delete_attribute_default(key)
+    "attributes.delete('data-th-'+ \'#{key}\')"
+  end  
 end

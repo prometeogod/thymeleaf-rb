@@ -7,8 +7,21 @@ class PrecompileBuffer
     buffer << "#{string}\n"
   end
 
+  def <<(string)
+    buffer << "#{string}\n"
+  end
+
   def flush
   	buffer.join
+  end
+
+  def length
+    buffer.length
+  end
+   
+  def empty?
+    return true if buffer.empty?
+    false
   end
 
   private
