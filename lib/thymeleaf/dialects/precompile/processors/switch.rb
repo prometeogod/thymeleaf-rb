@@ -2,14 +2,14 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 require_relative '../../../../../lib/thymeleaf'
 class SwitchPreprocessor
-  def call(node: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
-  	buffer_writer.begin_tag(node)
-  	evaluable, expr = Evaluation.evalue(attribute)
-  	buffer_writer.write "case expresion.call(context,\'#{expr}\')"
-  	if !node.children.empty?
-      precompiler.precompile_notext_children(node.children, buffer_writer)
-    end
-    buffer_writer.ending
-    buffer_writer.end_tag(node)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    new_context = "case_context = ContextHolder.new({}, context)"
+    switch_context_instruction = Instruction.new(new_context)
+    switch_var = PrecompileDialect::CONTEXT_SWITCH_VAR
+    begin_instruction_switch = buffer_writer.switch_statement(attribute, switch_var)
+    switch_instruction = Instruction.new(begin_instruction_switch)
+    node_instruction.instructions.attribute_instructions << switch_context_instruction 
+    node_instruction.instructions.attribute_instructions << switch_instruction
+    node.attributes.delete("data-th-switch")
   end
 end

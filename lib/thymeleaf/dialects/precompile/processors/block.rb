@@ -1,8 +1,11 @@
 require_relative '../../../../../lib/thymeleaf'
 class BlockPreprocessor
-  def call(node: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length:nil, object: nil)
-    if !node.children.empty?
-      precompiler.precompile_children(node.children, buffer_writer)
+  include Thymeleaf::Processor
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    node.children.each do |child|
+      subprocess_node(child, parent_instruction, buffer_writer)
     end
+    node.delete
+    node_instruction.delete
   end
 end

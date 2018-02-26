@@ -2,16 +2,10 @@ require_relative '../../../precompile/buffer_writer'
 require_relative '../../../precompile/evaluation'
 require_relative '../../../../../lib/thymeleaf'
 class IfPreprocessor
-  def call(node: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length:nil, object: nil)
-    evaluable, expr = Evaluation.evalue(attribute)
-    buffer_writer.write "if booleanize expresion.call(context,\'#{expr}\').to_s"
-    buffer_writer.begin_tag(node) if pos == 1
-    if pos == length
-      if !node.children.empty?
-        precompiler.precompile_children(node.children, buffer_writer)
-      end
-      buffer_writer.end_tag(node)
-      buffer_writer.ending
-    end
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    begin_instruction = buffer_writer.if_statement(attribute)
+    end_instruction = buffer_writer.ending
+    node_instruction.instructions.attribute_instructions << Instruction.new(begin_instruction, end_instruction)
+    node.attributes.delete("data-th-if") 
   end
 end

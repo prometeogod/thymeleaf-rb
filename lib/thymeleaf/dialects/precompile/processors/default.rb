@@ -1,15 +1,15 @@
 class DefaultPreprocessor
-  def call(node: nil, buffer_writer: nil, precompiler: nil, attribute: nil, pos: nil, length: nil, object: nil)
-  	if pos == 1
-  	  buffer_writer.begin_tag(node)
-  	  buffer_writer.begining
-    end
-    if pos == length
-      if !node.children.empty?
-        precompiler.precompile_children(node.children, buffer_writer)
-      end
-      buffer_writer.end_tag(node)
-      buffer_writer.ending
-    end
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    node.attributes.delete(('data-th-' + key))
+    default_instruction_begin = "value = EvalExpression.parse(context, \'#{attribute}\')"
+    default_instruction = Instruction.new(default_instruction_begin)
+    attributes_instruction = Instruction.new("attributes = #{node.attributes} unless attributes")
+    default_attribute_instruction = Instruction.new("attributes[\'#{key}\'] = value")
+    delete_attribute = Instruction.new(buffer_writer.delete_attribute_default(key))
+    
+    node_instruction.instructions.attribute_instructions << default_instruction
+    node_instruction.instructions.attribute_instructions << attributes_instruction
+    node_instruction.instructions.attribute_instructions << delete_attribute
+    node_instruction.instructions.attribute_instructions << default_attribute_instruction
   end
 end
