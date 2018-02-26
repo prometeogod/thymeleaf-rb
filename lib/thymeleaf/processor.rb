@@ -6,10 +6,12 @@ module Thymeleaf
     def evaluate_in_context(context, expr)
       ContextEvaluator.new(context).evaluate(expr)
     end
-
-    def subprocess_node(context, node, list)
-      processor = Thymeleaf::TemplateEngine.new
-      processor.send(:process_node, context, node, list)
+    
+    def subprocess_node(node, parent_instruction, buffer_writer)
+      node_instruction = NodeInstruction.new
+      parent_instruction.add_child(node_instruction)
+      precompiler = Precompiler.new
+      precompiler.send(:process_node, node, node_instruction, parent_instruction, buffer_writer)  
     end
 
     def load_template(template_name)
