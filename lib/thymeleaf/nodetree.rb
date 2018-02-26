@@ -10,6 +10,11 @@ class NodeTree
     self.parent = parent
   end
 
+  def delete
+    parent = self.parent
+    parent.children.delete(self) unless parent.nil?
+  end
+
   def add_child(node)
     children.push(node)
     node.parent = self

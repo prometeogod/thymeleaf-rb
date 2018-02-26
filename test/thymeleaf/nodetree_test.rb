@@ -70,4 +70,11 @@ describe NodeTree do
     html_string = @node.to_html
     assert_equal html_string, '<name><child></child></name>'
   end
+
+  it 'should delete a node from parent' do
+    @node.add_child(@child)
+    assert_equal @node.children.include?(@child), true
+    @child.delete
+    assert_equal @node.children.include?(@child), false 
+  end 
 end
