@@ -12,3 +12,6 @@ benchmarks/results/
 
 # Ignore coverage test
 coverage
+
+Guardfile
+*.swp
