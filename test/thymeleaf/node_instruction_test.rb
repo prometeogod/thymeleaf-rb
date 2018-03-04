@@ -68,6 +68,14 @@ describe NodeInstruction do
     assert_equal @node.children.include?(child), true
     child.delete
     assert_equal @node.children.include?(child), false
+  end
+
+  it 'should create a node instruction and add attributes' do
+    attributes = {'something' => 1 }
+    node = NodeInstruction.new(Instruction.new('inst1'))
+    assert_equal node.attributes.empty?, true
+    node.attributes.simple_attributes['something'] = 1
+    assert_equal node.attributes.simple_attributes, attributes
   end 
 
 end
