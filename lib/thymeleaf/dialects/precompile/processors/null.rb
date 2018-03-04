@@ -2,17 +2,23 @@
 class NullPreprocessor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
   	if attribute.nil?
+      simple_attributes_instruction = Instruction.new("attributes = #{node_instruction.attributes.simple_attributes}")
       if node.children.empty? && node_instruction.children.nil?
-        begin_instruction = buffer_writer.pretty_tag(node)
-        instruction = Instruction.new(begin_instruction)
+        instruction = Instruction.new(buffer_writer.pretty_tag(node))
       else
-      	begin_instruction = buffer_writer.begin_tag(node)
-        end_instruction = buffer_writer.end_tag(node)
-        instruction = Instruction.new(begin_instruction,end_instruction)
+        instruction = Instruction.new(buffer_writer.begin_tag(node),buffer_writer.end_tag(node))
       end
-      string_attributes_instruction = Instruction.new("attributes = #{node.attributes} unless attributes")
-      node_instruction.instructions.tag_instructions << string_attributes_instruction
+      node_instruction.instructions.tag_instructions << simple_attributes_instruction
+      node_instruction.attributes.from_default.each do |key, value|
+        attribute_value = Instruction.new("value = #{value}")
+        node_instruction.instructions.tag_instructions << attribute_value
+        attribute_set = Instruction.new("attributes[\'#{key}\'] = value")
+        node_instruction.instructions.tag_instructions << attribute_set
+      end
       node_instruction.instructions.tag_instructions << instruction
+    else
+      node_instruction.attributes.simple_attributes[key] = attribute
     end
+
   end
 end
