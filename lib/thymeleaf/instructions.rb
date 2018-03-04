@@ -29,37 +29,37 @@ class Instructions
   
   def to_buffer_begin_attribute_instructions(buffer)
     attribute_instructions.each do |attribute_instruction|
-      buffer << attribute_instruction.begin_instruction
+      buffer << attribute_instruction.begin_instruction unless attribute_instruction.begin_instruction.nil?
     end
   end
 
   def to_buffer_end_attribute_instructions(buffer)
     attribute_instructions.each do |attribute_instruction|
-      buffer << attribute_instruction.end_instruction
+      buffer << attribute_instruction.end_instruction unless attribute_instruction.end_instruction.nil?
     end
   end
 
   def to_buffer_begin_tag_instructions(buffer)
     tag_instructions.each do |tag_instruction|
-      buffer << tag_instruction.begin_instruction
+      buffer << tag_instruction.begin_instruction unless tag_instruction.begin_instruction.nil?
     end
   end
 
   def to_buffer_end_tag_instructions(buffer)
     tag_instructions.each do |tag_instruction|
-      buffer << tag_instruction.end_instruction
+      buffer << tag_instruction.end_instruction unless tag_instruction.end_instruction.nil?
     end
   end
 
   def to_buffer_begin_especial_instructions(buffer)
     especial_instructions.each do |especial_instruction|
-      buffer << especial_instruction.begin_instruction
+      buffer << especial_instruction.begin_instruction unless especial_instruction.begin_instruction.nil?
     end
   end
 
   def to_buffer_end_especial_instructions(buffer)
     especial_instructions.each do |especial_instruction|
-      buffer << especial_instruction.end_instruction
+      buffer << especial_instruction.end_instruction unless especial_instruction.end_instruction.nil?
     end 
   end
 
