@@ -12,6 +12,7 @@ describe Thymeleaf::Precompiler do
     @switch_template = Thymeleaf::Parser.new(template_switch).call
     @default_template = Thymeleaf::Parser.new('<p data-th-class="Texto">Texto</p>').call
     @block_template = Thymeleaf::Parser.new(template_block).call
+    @each_template = Thymeleaf::Parser.new('<p data-th-each= "element : ${list}" data-th-text="Texto">Texto</p>').call
   end
 
   it 'should be an empty parsed template' do 
@@ -61,6 +62,11 @@ describe Thymeleaf::Precompiler do
   it 'should be a function that process a block tag' do
     template_function = precompile_function(@block_template)
     assert_equal template_function, template_block_function
+  end
+
+  it 'should be a function that process a each attribute' do
+    template_function = precompile_function(@each_template)
+    assert_equal template_function, template_each_function
   end  
 
   private
@@ -71,21 +77,17 @@ describe Thymeleaf::Precompiler do
 
   def function_simple_result
    "->(context, writer, expresion, formatter){
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '/>'
-
-
 }
 "
   end
 
   def template_text_function
    "->(context, writer, expresion, formatter){
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,'Texto'))
-
-
 writer.write '</p>'
 }
 " 
@@ -93,22 +95,18 @@ writer.write '</p>'
 
   def template_utext_function
      "->(context, writer, expresion, formatter){
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write EvalExpression.parse(context,'Texto')
-
-
 writer.write '</p>'
 }
 " 
   end
   def template_text_content_function
 "->(context, writer, expresion, formatter){
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write 'Texto'
-
-
 writer.write '</p>'
 }
 " 
@@ -117,11 +115,9 @@ writer.write '</p>'
   def template_if_function
 "->(context, writer, expresion, formatter){
 if booleanize EvalExpression.parse(context, 'true')
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write 'Texto'
-
-
 writer.write '</p>'
 end
 }
@@ -131,11 +127,9 @@ end
   def template_unless_function
 "->(context, writer, expresion, formatter){
 unless booleanize EvalExpression.parse(context, 'false')
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write 'Texto'
-
-
 writer.write '</p>'
 end
 }
@@ -153,84 +147,94 @@ end
 "->(context, writer, expresion, formatter){
 case_context = ContextHolder.new({}, context)
 switch_var = EvalExpression.parse(context, '${numero}')
-attributes = {} unless attributes
+attributes = {}
 writer.write '<div' + formatter.attributes_string(attributes) + '>'
 writer.write '
 '
-
 if switch_var.eql?(EvalExpression.parse(case_context, '1'))
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,'Texto'))
-
-
 writer.write '</p>'
 end
 writer.write '
 '
-
 if switch_var.eql?(EvalExpression.parse(case_context, '2'))
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,'No'))
-
-
 writer.write '</p>'
 end
 writer.write '
 '
-
-
 writer.write '</div>'
-
-
 }
 "
   end
 
   def template_default_function
 "->(context, writer, expresion, formatter){
+attributes = {}
 value = EvalExpression.parse(context, 'Texto')
-attributes = {} unless attributes
-attributes.delete('data-th-'+ 'class')
 attributes['class'] = value
-attributes = {} unless attributes
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write 'Texto'
-
-
 writer.write '</p>'
-
-
-
-
 }
 "
   end
   
   def template_block
 '<th-block data-th-class="list list-tag">
-        <p data-th-unless="${must_show}" data-th-text="Texto"></p>
-    </th-block>'
+  <p data-th-unless="${must_show}" data-th-text="Texto"></p>
+</th-block>'
   end
 
   def template_block_function
   "->(context, writer, expresion, formatter){
 writer.write '
-        '
-
+  '
 unless booleanize EvalExpression.parse(context, '${must_show}')
-attributes = {} unless attributes
+attributes = {}
 writer.write '<p' + formatter.attributes_string(attributes) + '>'
 writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,'Texto'))
-
-
 writer.write '</p>'
 end
 writer.write '
-    '
-
+'
 }
-"    
+"
   end
+  
+  def template_each_function
+    "->(context, writer, expresion, formatter){
+def each_method(context, writer, expresion, formatter)
+variable, stat, enumerable = EachExpression.parse(context, 'element : ${list}')
+elements = ContextEvaluator.new(context).evaluate(enumerable)
+stat_var = formatter.init_stat_var(stat, elements)
+elements.each do |element|
+subcontext_vars = {}
+subcontext_vars[variable] = element unless variable.nil?
+attributes = {\"data-th-text\"=>\"Texto\"}
+unless stat.nil?
+stat_var[:index]  += 1
+stat_var[:count]  += 1
+stat_var[:current] = element
+stat_var[:even] = stat_var[:count].even?
+stat_var[:odd] = stat_var[:count].odd?
+stat_var[:first] = (stat_var[:index].eql? 0)
+stat_var[:last] = (stat_var[:count].eql? stat_var[:size])
+subcontext_vars[stat] = stat_var
+end
+context = ContextHolder.new(subcontext_vars, context)
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+writer.write Oga::XML::Entities.encode(EvalExpression.parse(context,'Texto'))
+writer.write '</p>'
+end
+end
+each_method(context, writer, expresion, formatter)
+}
+"
+  end    
 end

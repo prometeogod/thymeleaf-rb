@@ -3,6 +3,7 @@ require 'thymeleaf/template'
 describe Thymeleaf::Template do 
   before(:each) do
     @simple_template = '<p></p>'
+    @html_attribute = '<p id="1"></p>'
     @text_template = '<p data-th-text="Texto"></p>'
     @utext_template = '<p data-th-utext="Texto"></p>'
     @utext_and_text = '<p data-th-utext="Texto" data-th-text="Texto"></p>'
@@ -17,12 +18,18 @@ describe Thymeleaf::Template do
     @block_template = '<th-block data-th-class="list list-tag">
         <p data-th-unless="${must_show}" data-th-text="Texto"></p>
     </th-block>'
+    @each_template = '<p data-th-each= "element : ${list}" data-th-text="Texto">Texto</p>'
   end
   
   it 'should be a contracted tag' do
     processed = render(@simple_template)
     assert_equal processed, '<p/>'
   end
+
+  it 'should be a contrated with a simple id attribute' do 
+    processed = render(@html_attribute)
+    assert_equal processed, "<p id=\"1\"/>"
+  end 
 
   it 'should be a normal tags and text content' do 
   	processed = render(@text_template)
@@ -69,6 +76,11 @@ describe Thymeleaf::Template do
     assert_equal processed.squeeze, block_result
   end
 
+  it 'should repeat the text the number of items of the list passed' do 
+    processed = render(@each_template, {'list' => [1,2,3]})
+    assert_equal processed, each_result
+  end 
+
   private
 
   def render(source, context = {})
@@ -94,6 +106,10 @@ describe Thymeleaf::Template do
     '
  <p>Texto</p>
  '
+  end
+
+  def each_result
+    '<p>Texto</p><p>Texto</p><p>Texto</p>'
   end  
 
 end
