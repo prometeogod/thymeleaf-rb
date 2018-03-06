@@ -5,7 +5,7 @@ class NodeInstruction
   
   attr_accessor :instructions, :nodetree, :children, :parent, :attributes
 
-  def initialize(instructions = Instructions.new, nodetree = nil, children = nil, parent = nil, attributes = NodeInstructionAttributes.new)
+  def initialize(instructions = Instructions.new, nodetree = nil, children = [], parent = nil, attributes = NodeInstructionAttributes.new)
    	@instructions = instructions
     @nodetree = nodetree
     @children = children 

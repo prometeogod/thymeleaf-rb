@@ -28,7 +28,7 @@ describe NodeInstruction do
 
   it 'should not have children' do 
     node = NodeInstruction.new(Instruction.new("example"),@nodetree)
-    assert_equal node.children, nil
+    assert_equal node.children, []
   end  
 
   it 'should have next node' do 

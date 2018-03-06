@@ -3,7 +3,7 @@ class NullPreprocessor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
   	if attribute.nil?
       simple_attributes_instruction = Instruction.new("attributes = #{node_instruction.attributes.simple_attributes}")
-      if node.children.empty? && node_instruction.children.nil?
+      if node.children.empty? && node_instruction.children.empty?
         instruction = Instruction.new(buffer_writer.pretty_tag(node))
       else
         instruction = Instruction.new(buffer_writer.begin_tag(node),buffer_writer.end_tag(node))
