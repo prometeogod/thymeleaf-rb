@@ -20,6 +20,7 @@ class NodeInstruction
 
   def to_buffer(buffer)
     instructions.to_buffer_begin(buffer)
+    instructions.to_buffer_before_children(buffer)
     unless children.nil?
       children.each do |child|
         child.to_buffer(buffer)

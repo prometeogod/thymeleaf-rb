@@ -1,10 +1,11 @@
 class Instructions
-  attr_accessor :tag_instructions, :attribute_instructions, :especial_instructions
+  attr_accessor :tag_instructions, :attribute_instructions, :especial_instructions, :before_children
   
-  def initialize(tag_instructions = [], attribute_instructions = [], especial_instructions = [])
+  def initialize(tag_instructions = [], attribute_instructions = [], especial_instructions = [], before_children = [])
     @tag_instructions = tag_instructions
     @attribute_instructions = attribute_instructions
     @especial_instructions = especial_instructions
+    @before_children = before_children
   end
 
   def empty?
@@ -15,6 +16,13 @@ class Instructions
   	to_buffer_begin_especial_instructions(buffer)
     to_buffer_begin_attribute_instructions(buffer)
     to_buffer_begin_tag_instructions(buffer)
+  end
+
+  def to_buffer_before_children(buffer)
+    before_children.each do |instruction|
+      buffer << instruction.begin_instruction unless instruction.begin_instruction.nil?
+      buffer << instruction.end_instruction unless instruction.end_instruction.nil?
+    end
   end
 
   def to_buffer_end(buffer)

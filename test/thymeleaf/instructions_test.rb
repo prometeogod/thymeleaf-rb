@@ -7,6 +7,7 @@ describe Instructions do
     @tag_instructions = [Instruction.new(3,4)]
     @attribute_instructions = [Instruction.new(2,5)]
     @especial_instructions = [Instruction.new(1,6)]
+    @before_children_instructions = [Instruction.new(3.5,3.75)]
     @buffer = []
   end
 
@@ -49,5 +50,16 @@ describe Instructions do
     @instructions.to_buffer_begin(@buffer)
     @instructions.to_buffer_end(@buffer)
     assert_equal @buffer, [1,2,3,4,5,6]
+  end
+
+  it 'should write before children instructions ' do 
+    @instructions.attribute_instructions = @attribute_instructions
+    @instructions.tag_instructions = @tag_instructions
+    @instructions.especial_instructions = @especial_instructions
+    @instructions.before_children = @before_children_instructions
+    @instructions.to_buffer_begin(@buffer)
+    @instructions.to_buffer_before_children(@buffer)
+    @instructions.to_buffer_end(@buffer)
+    assert_equal @buffer, [1,2,3,3.5,3.75,4,5,6]
   end     
 end

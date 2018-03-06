@@ -4,8 +4,9 @@ require 'thymeleaf'
 
 describe NodeInstruction do 
   before(:each) do
-    @node = NodeInstruction.new('node')
+    @node = NodeInstruction.new
     @nodetree = NodeTree.new('example_nodetree')
+    @buffer = []
   end
 
   it 'should create a node with an empty instruction' do
@@ -76,6 +77,15 @@ describe NodeInstruction do
     assert_equal node.attributes.empty?, true
     node.attributes.simple_attributes['something'] = 1
     assert_equal node.attributes.simple_attributes, attributes
+  end
+
+  it 'should run the instructions in the rigth order' do
+    @node.instructions.especial_instructions << Instruction.new(1,8)
+    @node.instructions.attribute_instructions << Instruction.new(2,7)
+    @node.instructions.tag_instructions << Instruction.new(3,6)
+    @node.instructions.before_children << Instruction.new(4,5)
+    @node.to_buffer(@buffer)
+    assert_equal @buffer, [1,2,3,4,5,6,7,8]
   end 
 
 end
