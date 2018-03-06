@@ -24,16 +24,16 @@ class PrecompileDialect < Dialect
     {
       #insert:   InsertProcessor,
       #replace:  ReplaceProcessor,
-      #fragment: FragmentProcessor,
+      fragment: FragmentPreprocessor,
       each:     EachPreprocessor,
       if:       IfPreprocessor,
       unless:   UnlessPreprocessor,
       switch:   SwitchPreprocessor,
       case:     CasePreprocessor,
-      object:   ObjectPreprocessor, # TODO in progress
+      object:   ObjectPreprocessor, 
       text:     TextPreprocessor,
       utext:    UTextPreprocessor,
-      #remove:   RemoveProcessor,
+      remove:   RemovePreprocessor,
       default:  DefaultPreprocessor
     }
   end
@@ -48,4 +48,6 @@ class PrecompileDialect < Dialect
   require_relative 'processors/default'
   require_relative 'processors/object'
   require_relative 'processors/each'
+  require_relative 'processors/fragment'
+  require_relative 'processors/remove'
 end

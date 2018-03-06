@@ -19,6 +19,11 @@ describe Thymeleaf::Template do
         <p data-th-unless="${must_show}" data-th-text="Texto"></p>
     </th-block>'
     @each_template = '<p data-th-each= "element : ${list}" data-th-text="Texto">Texto</p>'
+    @remove_none = '<p data-th-remove="none">Texto</p>'
+    @remove_all = '<p data-th-remove="all">Texto</p>'
+    @remove_body = '<p data-th-remove="body">Texto</p>'
+    @remove_tag = '<p data-th-remove="tag"><p>Texto</p></p>'
+    @remove_all_but_first = '<p data-th-remove="all-but-first">Texto<b>Borrar</b></p>'
   end
   
   it 'should be a contracted tag' do
@@ -67,7 +72,7 @@ describe Thymeleaf::Template do
   end
 
   it 'should remove data-th attribute and create a new one with the last part' do 
-    processed = render(@default_template, {})
+    processed = render(@default_template)
     assert_equal processed, default_result
   end
 
@@ -81,6 +86,31 @@ describe Thymeleaf::Template do
     assert_equal processed, each_result
   end 
 
+  it 'should remove none' do 
+    processed = render(@remove_none)
+    assert_equal processed, simple_result
+  end
+
+  it 'should remove all' do 
+    processed = render(@remove_all)
+    assert_equal processed, ''
+  end
+
+  it 'should remove body' do 
+    processed = render(@remove_body)
+    assert_equal processed, '<p></p>'
+  end
+
+  it 'should remove tag' do 
+    processed = render(@remove_tag)
+    assert_equal processed, simple_result
+  end
+
+  it 'should remove all but first' do 
+    processed = render(@remove_all_but_first)
+    assert_equal processed, simple_result
+  end
+  
   private
 
   def render(source, context = {})

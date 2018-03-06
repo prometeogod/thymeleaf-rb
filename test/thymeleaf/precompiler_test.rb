@@ -13,6 +13,7 @@ describe Thymeleaf::Precompiler do
     @default_template = Thymeleaf::Parser.new('<p data-th-class="Texto">Texto</p>').call
     @block_template = Thymeleaf::Parser.new(template_block).call
     @each_template = Thymeleaf::Parser.new('<p data-th-each= "element : ${list}" data-th-text="Texto">Texto</p>').call
+    @remove_template = Thymeleaf::Parser.new('<p data-th-remove="none">Texto<h>child</h></p>').call
   end
 
   it 'should be an empty parsed template' do 
@@ -67,7 +68,12 @@ describe Thymeleaf::Precompiler do
   it 'should be a function that process a each attribute' do
     template_function = precompile_function(@each_template)
     assert_equal template_function, template_each_function
-  end  
+  end
+
+  it 'should be a function that includes instructions to not process parts of code' do
+    template_function = precompile_function(@remove_template)
+    assert_equal template_function, template_remove_function
+  end 
 
   private
 
@@ -236,5 +242,29 @@ end
 each_method(context, writer, expresion, formatter)
 }
 "
-  end    
+  end
+
+  def template_remove_function
+    "->(context, writer, expresion, formatter){
+expr = EvalExpression.parse(context, 'none')
+unless (expr=='all' || expr == 'true' )
+unless (expr =='tag')
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+end
+unless (expr == 'body')
+writer.write 'Texto'
+unless (expr == 'all-but-first')
+attributes = {}
+writer.write '<h' + formatter.attributes_string(attributes) + '>'
+writer.write 'child'
+writer.write '</h>'
+end
+end
+writer.write '</p>'
+end
+}
+"
+  end
+
 end
