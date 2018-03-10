@@ -29,7 +29,7 @@ module Thymeleaf
     end
   
     def root_node(buffer_writer)
-      initial_instruction = buffer_writer.initial_declaration('->(context, writer, expresion, formatter)')
+      initial_instruction = buffer_writer.initial_declaration('->(context, writer, formatter)')
       final_instruction = buffer_writer.final_declaration
       instruction = Instruction.new(initial_instruction, final_instruction)
       instructions = Instructions.new

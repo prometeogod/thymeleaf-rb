@@ -1,10 +1,10 @@
-
+# Processor Each
 class EachPreprocessor
   include Thymeleaf::Processor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
   	node.attributes.delete('data-th-each')
-  	def_method_each = Instruction.new("def each_method(context, writer, expresion, formatter)",buffer_writer.ending)
-  	method_call = Instruction.new(nil,"each_method(context, writer, expresion, formatter)")
+  	def_method_each = Instruction.new("def each_method(context, writer, formatter)",buffer_writer.ending)
+  	method_call = Instruction.new(nil,"each_method(context, writer, formatter)")
     each_variables = Instruction.new("variable, stat, enumerable = EachExpression.parse(context, \'#{attribute}\')")
     elements_variable = Instruction.new("elements = ContextEvaluator.new(context).evaluate(enumerable)")
     init_stat_var = Instruction.new("stat_var = formatter.init_stat_var(stat, elements)")

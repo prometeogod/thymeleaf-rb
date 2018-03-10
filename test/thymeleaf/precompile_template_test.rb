@@ -26,14 +26,14 @@ describe Thymeleaf::Template do
     @remove_all_but_first = '<p data-th-remove="all-but-first">Texto<b>Borrar</b></p>'
   end
   
-  it 'should be a contracted tag' do
+  it 'should be an begin tag and an end tag' do
     processed = render(@simple_template)
-    assert_equal processed, '<p/>'
+    assert_equal processed, '<p></p>'
   end
 
-  it 'should be a contrated with a simple id attribute' do 
+  it 'should be tags with a simple id attribute' do 
     processed = render(@html_attribute)
-    assert_equal processed, "<p id=\"1\"/>"
+    assert_equal processed, '<p id="1"></p>'
   end 
 
   it 'should be a normal tags and text content' do 
