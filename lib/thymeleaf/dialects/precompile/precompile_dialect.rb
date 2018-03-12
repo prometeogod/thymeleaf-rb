@@ -22,8 +22,8 @@ class PrecompileDialect < Dialect
   # Precedence based on order for the time being
   def processors
     {
-      #insert:   InsertProcessor,
-      #replace:  ReplaceProcessor,
+      insert:   InsertPreprocessor,
+      replace:  ReplacePreprocessor,
       fragment: FragmentPreprocessor,
       each:     EachPreprocessor,
       if:       IfPreprocessor,
@@ -50,4 +50,6 @@ class PrecompileDialect < Dialect
   require_relative 'processors/each'
   require_relative 'processors/fragment'
   require_relative 'processors/remove'
+  require_relative 'processors/insert'
+  require_relative 'processors/replace'
 end

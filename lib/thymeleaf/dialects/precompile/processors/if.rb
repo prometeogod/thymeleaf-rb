@@ -1,5 +1,4 @@
 require_relative '../../../precompile/buffer_writer'
-require_relative '../../../precompile/evaluation'
 require_relative '../../../../../lib/thymeleaf'
 class IfPreprocessor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
