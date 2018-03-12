@@ -13,6 +13,7 @@ describe PrecompileBuffer do
   it 'should write something' do
     something = '<something>'
     @buffer.write(something)
+    assert_equal @buffer.empty?, false
     assert_equal @buffer.length, 1
     assert_equal @buffer.flush, "<something>\n"
   end

@@ -19,10 +19,8 @@ class Instructions
   end
 
   def to_buffer_before_children(buffer)
-    before_children.each do |instruction|
-      buffer << instruction.begin_instruction unless instruction.begin_instruction.nil?
-      buffer << instruction.end_instruction unless instruction.end_instruction.nil?
-    end
+    to_buffer_begin_before_children(buffer)
+    to_buffer_end_before_children(buffer)
   end
 
   def to_buffer_end(buffer)
@@ -31,9 +29,19 @@ class Instructions
     to_buffer_end_especial_instructions(buffer)
   end 
 
-  private 
-  
-  # REGULAR_EXP = /to_buffer_(begin|end)_(\w*)/
+  private
+
+  def to_buffer_begin_before_children(buffer)
+    before_children.each do |instruction|
+      buffer << instruction.begin_instruction unless instruction.begin_instruction.nil?
+    end
+  end
+
+  def to_buffer_end_before_children(buffer)
+    before_children.reverse.each do |instruction|
+      buffer << instruction.end_instruction unless instruction.end_instruction.nil? 
+    end
+  end
   
   def to_buffer_begin_attribute_instructions(buffer)
     attribute_instructions.each do |attribute_instruction|

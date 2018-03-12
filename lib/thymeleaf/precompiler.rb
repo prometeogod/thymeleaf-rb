@@ -44,6 +44,7 @@ module Thymeleaf
     def process_nodes(nodes, parent_instruction, buffer_writer)
       nodes.each do |node|
         node_instruction = NodeInstruction.new
+        node_instruction.nodetree = node
         parent_instruction.add_child(node_instruction)
         process_node(node, node_instruction, parent_instruction, buffer_writer)
       end
@@ -58,17 +59,18 @@ module Thymeleaf
     end
   
     def process_especial_node(node, node_instruction, parent_instruction, buffer_writer)
+      instructions = node_instruction.instructions.especial_instructions
       case node.name
       when 'text-content'
-        instruction = Instruction.new(buffer_writer.text_content(node))
+        instructions << Instruction.new(buffer_writer.text_content(node))
       when 'comment'
-        instruction = Instruction.new(buffer_writer.comment_content(node))
+        instructions << Instruction.new(buffer_writer.comment_content(node))
       when 'doctype'
-      
+        instructions << Instruction.new(buffer_writer.doctype_content(node))
       when 'meta'
-      
+        instructions << Instruction.new("attributes = #{node.attributes}")
+        instructions << Instruction.new(buffer_writer.meta_content(node))
       end
-      node_instruction.instructions.especial_instructions << instruction
     end
   
     def process_normal_node(node, node_instruction, parent_instruction, buffer_writer)

@@ -21,8 +21,7 @@
         <div>Bread</div>
         <div>A cool hat</div>
         <div>Some unexpected item</div>
-    
-</article>
+    </article>
 ---
 <article>
     <h1><%= "My incredible shopping list" %></h1>

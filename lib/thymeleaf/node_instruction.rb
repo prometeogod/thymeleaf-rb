@@ -30,9 +30,10 @@ class NodeInstruction
   end
 
   def add_child(child)
-    child.parent = self
-    self.children = [] if children.nil?
-    children << child
+    unless children.include?(child)
+      child.parent = self
+      children << child
+    end
   end
 
   def delete

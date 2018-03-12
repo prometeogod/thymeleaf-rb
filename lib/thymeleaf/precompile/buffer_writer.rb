@@ -24,6 +24,14 @@ class BufferWriter
   def comment_content(node)
     write"\'<!--#{node.attributes}-->\'"
   end
+
+  def meta_content(node)
+    write"\'<#{node.name}\' + formatter.attributes_string(attributes) + \'/>\'"
+  end
+
+  def doctype_content(node)
+    write "\'#{node.attributes}\'"
+  end
   
   def initial_declaration(declaration)
     "#{declaration}{"
