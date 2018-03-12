@@ -14,6 +14,8 @@ describe Thymeleaf::Precompiler do
     @block_template = Thymeleaf::Parser.new(template_block).call
     @each_template = Thymeleaf::Parser.new('<p data-th-each= "element : ${list}" data-th-text="Texto">Texto</p>').call
     @remove_template = Thymeleaf::Parser.new('<p data-th-remove="none">Texto<h>child</h></p>').call
+    @fragment_template = Thymeleaf::Parser.new('<p data-th-fragment="texto">Texto</p>').call
+    @insert_template = Thymeleaf::Parser.new(template_insert).call
   end
 
   it 'should be an empty parsed template' do 
@@ -73,8 +75,17 @@ describe Thymeleaf::Precompiler do
   it 'should be a function that includes instructions to not process parts of code' do
     template_function = precompile_function(@remove_template)
     assert_equal template_function, template_remove_function
-  end 
+  end
 
+  it 'should be a function that defines dinamically a singleton method that process the fragment' do 
+    template_function = precompile_function(@fragment_template)
+    assert_equal template_function, template_fragment_function
+  end
+
+  it 'should be a function that process fragment and insert this fragment' do 
+    template_function = precompile_function(@insert_template)
+    assert_equal template_function, template_insert_function
+  end 
   private
 
   def precompile_function(parsed_template)
@@ -270,4 +281,55 @@ end
 "
   end
 
+  def template_fragment_function
+"->(context, writer, formatter){
+fragment_name = EvalExpression.parse(context, 'texto')
+private_var = \"fragment_var_\" + fragment_name
+define_singleton_method(private_var) do 
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+writer.write 'Texto'
+writer.write '</p>'
+end
+eval(private_var)
+}
+"
+  end
+  
+  def template_insert
+'<p data-th-fragment="texto">Texto</p>
+<p data-th-insert="this::texto"></p>'
+  end
+
+  def template_insert_function
+"->(context, writer, formatter){
+fragment_name = EvalExpression.parse(context, 'texto')
+private_var = \"fragment_var_\" + fragment_name
+define_singleton_method(private_var) do 
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+writer.write 'Texto'
+writer.write '</p>'
+end
+eval(private_var)
+writer.write '
+'
+template, fragment = FragmentExpression.parse(context, 'this::texto')
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+if (template=='this' || template.nil?)
+unless fragment.nil?
+if fragment.match(/#^*/).nil?
+eval('fragment_var_' + fragment)
+else
+end
+end
+else
+subtemplate = EvalExpression.parse(context, template)
+writer.write formatter.print_extern_template(subtemplate, context, fragment)
+end
+writer.write '</p>'
+}
+"
+  end
 end

@@ -7,8 +7,7 @@ module Thymeleaf
       ContextEvaluator.new(context).evaluate(expr)
     end
     
-    def subprocess_node(node, parent_instruction, buffer_writer)
-      node_instruction = NodeInstruction.new
+    def subprocess_node(node, node_instruction, parent_instruction, buffer_writer)
       parent_instruction.add_child(node_instruction)
       precompiler = Precompiler.new
       precompiler.send(:process_node, node, node_instruction, parent_instruction, buffer_writer)  
