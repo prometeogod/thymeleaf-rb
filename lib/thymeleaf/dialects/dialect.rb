@@ -13,4 +13,8 @@ class Dialect
   def processors
     {}
   end
+
+  def html_processors
+    {}
+  end
 end

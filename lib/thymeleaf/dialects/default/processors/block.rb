@@ -1,12 +1,14 @@
-require_relative '../../../nodetree'
-# BlockProcessor class definition
+require_relative '../../../../../lib/thymeleaf'
+require_relative '../../../../../lib/thymeleaf/processor'
 class BlockProcessor
   include Thymeleaf::Processor
-  def call(node: nil, context: nil, list: nil,  **_)
-    node.children.reverse.each do |child|
-      subprocess_node(context, child, list)
-      node.add_next_sibling(child)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    node.children.each do |child|
+      node_instruction_child = NodeInstruction.new
+      node_instruction_child.nodetree = child
+      subprocess_node(child, node_instruction_child, parent_instruction, buffer_writer)
     end
-    list.delete(node)
+    node.delete
+    node_instruction.delete
   end
 end

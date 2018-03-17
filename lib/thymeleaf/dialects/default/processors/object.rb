@@ -1,19 +1,15 @@
-require_relative '../../../utils/booleanize'
-# ObjectProcessor class definition : it process object tag
+require_relative '../../../precompile/buffer_writer'
+require_relative '../../../../../lib/thymeleaf'
 class ObjectProcessor
-  include Thymeleaf::Processor
-
-  def call(node: nil, attribute: nil, context: nil, **_)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
     node.attributes.delete('data-th-object')
-
-    obj_var = EvalExpression.parse_single_expression(context, attribute)
-    new_context = ContextHolder.new({}, context)
-    new_context.set_private(DefaultDialect::CONTEXT_OBJECT_VAR, obj_var)
-
-    new_context
-  end
-
-  def subcontext?
-    true
+    object_var = "obj_var = EvalExpression.parse_single_expression(context, \'#{attribute}\')"
+    context_holder = "context = ContextHolder.new({}, obj_var)"
+   
+    
+    object_var_instruction = Instruction.new(object_var)
+    node_instruction.instructions.attribute_instructions << Instruction.new("def object_method(context, writer, formatter)", buffer_writer.ending)
+    node_instruction.instructions.attribute_instructions << object_var_instruction
+    node_instruction.instructions.attribute_instructions << Instruction.new(context_holder,"object_method(context, writer, formatter)")
   end
 end

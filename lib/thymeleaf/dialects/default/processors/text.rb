@@ -1,18 +1,12 @@
-require_relative '../../../nodetree'
-require 'oga'
-# TextProcessor class definition : it process escaped text in text tag
+# TextPreprocessor
 class TextProcessor
-  include Thymeleaf::Processor
-
-  def call(node: nil, attribute: nil, context: nil, **_)
-    child_text = EvalExpression.parse(context, attribute)
-    child_text = Oga::XML::Entities.encode(child_text)
-    child = NodeTree.new('text-content', child_text)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    instruction = buffer_writer.write "Oga::XML::Entities.encode(EvalExpression.parse(context,\'#{attribute}\'))"
+    text_node = NodeInstruction.new
+    text_node.nodetree = node
+    text_node.instructions.especial_instructions << Instruction.new(instruction)
+    node_instruction.add_child(text_node)
     node.children.clear
-    node.add_child(child)
     node.attributes.delete('data-th-text')
-   
-    node
   end
-
 end

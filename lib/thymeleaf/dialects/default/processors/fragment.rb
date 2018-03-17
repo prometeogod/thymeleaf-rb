@@ -1,12 +1,18 @@
-# FragmentProcessor class definition
+require_relative '../../../../../lib/thymeleaf'
 class FragmentProcessor
-  include Thymeleaf::Processor
-
-  def call(node: nil, attribute: nil, context: nil, **_)
-    fragment_name = EvalExpression.parse(context, attribute)
-    private_var = DefaultDialect.context_fragment_var(fragment_name)
-    context.root.set_private private_var, node
-
+  include Thymeleaf::Processor  
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    fragment_name = Instruction.new("fragment_name = EvalExpression.parse(context, \'#{attribute}\')")
+    fragment_var = DefaultDialect::CONTEXT_FRAGMENT_VAR
+    private_var = Instruction.new("private_var = \"#{fragment_var}_\" + fragment_name")
+    method_header = Instruction.new("define_singleton_method(private_var) do ",buffer_writer.ending)
+    method_call = Instruction.new(nil,"eval(private_var)")
+    
+    node_instruction.instructions.attribute_instructions << fragment_name
+    node_instruction.instructions.attribute_instructions << private_var
+    node_instruction.instructions.attribute_instructions << method_header
+    node_instruction.instructions.attribute_instructions << method_call
+    
     node.attributes.delete('data-th-fragment')
   end
 end

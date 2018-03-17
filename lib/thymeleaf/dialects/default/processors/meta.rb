@@ -1,4 +1,4 @@
-class MetaPreprocessor
+class MetaProcessor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
     instructions = node_instruction.instructions.especial_instructions
     instructions << Instruction.new("attributes = #{node.attributes}")

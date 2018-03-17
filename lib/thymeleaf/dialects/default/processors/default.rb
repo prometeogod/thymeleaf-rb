@@ -1,11 +1,7 @@
-# DefaultProcessor class definition : it process default tags data-th-*
 class DefaultProcessor
-  include Thymeleaf::Processor
-
-  def call(key: nil, node: nil, attribute: nil, context: nil, **_)
-    value = EvalExpression.parse(context, attribute)
-    node.attributes = node.attributes.clone
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
     node.attributes.delete(('data-th-' + key))
-    node.attributes[key] = value
+    default_value = "EvalExpression.parse(context, \'#{attribute}\')"
+    node_instruction.attributes.from_default[key] = default_value
   end
 end

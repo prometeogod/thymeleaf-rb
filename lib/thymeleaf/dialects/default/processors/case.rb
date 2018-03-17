@@ -1,21 +1,11 @@
-# CaseProcessor class definition : it process case tags
+require_relative '../../../precompile/buffer_writer'
 class CaseProcessor
-  include Thymeleaf::Processor
-
-  def call(node: nil, attribute: nil, context: nil, list: nil, **_)
-    node.attributes.delete('data-th-case')
-
-    var_cmp = EvalExpression.parse(context, attribute)
-
-    return if case_equals? context, var_cmp
-    
-    list.delete(node)
-    
-  end
-
-  def case_equals?(context, var_comparation)
-    context_switch_var = DefaultDialect::CONTEXT_SWITCH_VAR
-    (context.private? context_switch_var) &&
-      (context.get_private context_switch_var).eql?(var_comparation)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+    switch_var = DefaultDialect::CONTEXT_SWITCH_VAR
+    case_instruction_begin = buffer_writer.case_statement(attribute, switch_var)
+    case_instruction_end = buffer_writer.ending
+    case_instruction = Instruction.new(case_instruction_begin, case_instruction_end)
+    node_instruction.instructions.attribute_instructions << case_instruction
+    node.attributes.delete("data-th-case")
   end
 end

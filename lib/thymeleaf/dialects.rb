@@ -56,7 +56,7 @@ module Thymeleaf
 
     def null_processor
       #@null_processor ||= NullProcessor.new
-      @null_processor ||= NullPreprocessor.new
+      @null_processor ||= NullProcessor.new
     end
 
     def expand_key_dialect(*args)

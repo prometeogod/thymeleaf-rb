@@ -21,9 +21,4 @@ module Thymeleaf
       end
     end
   end
-  # NullProcessor class definition
-  class NullProcessor
-    def call(**_)
-    end
-  end
 end

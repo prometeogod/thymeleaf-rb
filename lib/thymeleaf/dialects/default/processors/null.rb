@@ -1,5 +1,5 @@
 # Class NullPreprocessor
-class NullPreprocessor
+class NullProcessor
   def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
   	if attribute.nil?
       unless node.name.empty?
