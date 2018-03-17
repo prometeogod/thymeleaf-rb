@@ -1,5 +1,5 @@
 # Thymeleaf module
-require_relative 'dialects/precompile/processors/null'
+require_relative 'dialects/default/processors/null'
 module Thymeleaf
   # Dialects class definition
   class Dialects
@@ -15,12 +15,14 @@ module Thymeleaf
       registered_dialects[key] = dialect
       registered_attr_processors[key] = dialect_processors(dialect)
       registered_tag_processors[key] = dialect_tag_processors(dialect)
+      registered_html_processors[key] = dialect_html_processors(dialect)
     end
 
     def clear_dialects
       self.registered_dialects        = {}
       self.registered_attr_processors = {}
       self.registered_tag_processors  = {}
+      self.registered_html_processors = {}
     end
 
     def find_attr_processor(key)
@@ -31,10 +33,14 @@ module Thymeleaf
       find_processor key, dialect_tag_matchers, registered_tag_processors
     end
 
+    def find_html_processor(key)
+      find_processor_html key, dialect_html_matchers, registered_html_processors
+    end
+
     private
 
     attr_accessor :registered_dialects, :registered_attr_processors
-    attr_accessor :registered_tag_processors
+    attr_accessor :registered_tag_processors, :registered_html_processors
 
     def dialect_attr_matchers
       /^data-(#{registered_dialects.keys.join("|")})-(.*)$/
@@ -42,6 +48,10 @@ module Thymeleaf
 
     def dialect_tag_matchers
       /^(#{registered_dialects.keys.join("|")})-(.*)$/
+    end
+
+    def dialect_html_matchers
+      /^(meta|doctype|text_content|comment)/
     end
 
     def null_processor
@@ -70,6 +80,25 @@ module Thymeleaf
       dialect.tag_processors.reduce({}) do |processors, (processor_key, processor)|
         processors[processor_key.to_s] = processor.new
         processors
+      end
+    end
+
+    def dialect_html_processors(dialect)
+      dialect.html_processors.reduce({}) do |processors, (processor_key, processor)|
+        processors[processor_key.to_s] = processor.new 
+        processors
+      end
+    end
+    
+    def find_processor_html(key, dialect_matchers, processor_list)
+      unless dialect_matchers.match(key).nil?
+        dialect_key = 'th'
+        dialect_processors = processor_list[dialect_key]
+        raise ArgumentError, "No dialect found for key #{key}" if dialect_processors.nil?
+
+        processor = dialect_processors[key]
+        raise ArgumentError, "No processor found for key #{key}" if processor.nil?
+        [key, processor]
       end
     end
 
