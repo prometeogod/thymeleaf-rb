@@ -80,7 +80,7 @@ class NodeTree
 
   def to_html_text(node)
     case node.name
-    when 'text-content'
+    when 'text_content'
       node.attributes
     when 'comment'
       '<!--' + node.attributes + '-->'

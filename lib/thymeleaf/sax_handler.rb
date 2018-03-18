@@ -29,7 +29,7 @@ class SaxHandler
 
   # Actions to perform when is text
   def on_text(text)
-    node_text = NodeTree.new('text-content', text)
+    node_text = NodeTree.new('text_content', text)
     parent = @names.last
     if parent.nil?
       @nodes << node_text
