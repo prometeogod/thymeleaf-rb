@@ -20,6 +20,13 @@ class NodeTree
     node.parent = self
   end
 
+  def append(list)
+    list.each do |node|
+      self.add_child(node)
+    end
+    self
+  end
+
   def add_next_sibling(node)
     index = parent.children.index(self)
     parent.children.insert(index + 1, node)
@@ -55,8 +62,7 @@ class NodeTree
 
   def to_html
     string = ''
-    condition = key_word?(name)
-    string + (condition ? to_html_text(self) : to_html_regular(self))
+    string + (key_word?(name) ? to_html_text(self) : to_html_regular(self))
   end
 
   def to_s_attr
@@ -78,17 +84,21 @@ class NodeTree
     list
   end
 
-  def to_html_text(node)
+  def to_html_text(node, string = '')
     case node.name
     when 'text_content'
-      node.attributes
+      string << node.attributes
     when 'comment'
-      '<!--' + node.attributes + '-->'
+      string << "<!-- #{node.attributes} -->"
     when 'doctype'
-      node.attributes
+      string << node.attributes
     when 'meta'
-      '<' + node.name + to_s_attributes(node.attributes) + '/>'
+      string << "< #{node.name} #{to_s_attributes(node.attributes)} />"
+    when 'root'
+      string
     end
+    node.children.each{|child| string += child.to_html}
+    string
   end
 
   def to_html_regular(node, string = '')

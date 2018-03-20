@@ -7,8 +7,8 @@ describe SaxHandler do
     parsed_fragment = '<input data-th-placeholder="new"></input>'
 
     parsed_template = Thymeleaf::Parser.new(fragment).call
-    assert_equal parsed_template.is_a?(Array), true
-    html_string = parsed_template.map{|node| node.to_html}.join
+    assert_equal parsed_template.is_a?(NodeTree), true
+    html_string = parsed_template.to_html
     assert_equal html_string, parsed_fragment
   end
 end

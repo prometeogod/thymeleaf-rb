@@ -22,29 +22,24 @@ module Thymeleaf
     def template_function
       buffer = PrecompileBuffer.new
       buffer_writer = BufferWriter.new
-      root_node = root_node(buffer_writer)
-      process_nodes(parsed_template, root_node, buffer_writer)
-      root_node.to_buffer(buffer)
+      process_template(parsed_template, buffer_writer).to_buffer(buffer)
       buffer.flush
     end
   
-    def root_node(buffer_writer)
-      initial_instruction = buffer_writer.initial_declaration('->(context, writer, formatter)')
-      final_instruction = buffer_writer.final_declaration
-      instruction = Instruction.new(initial_instruction, final_instruction)
-      instructions = Instructions.new
-      instructions.especial_instructions << instruction
-      NodeInstruction.new(instructions)
-    end
-
     def eval_function(function)
       eval(function)
+    end
+
+    def process_template(template, buffer_writer)
+      root = NodeInstruction.new
+      process_node(template, root, nil, buffer_writer)
+      process_nodes(template.children, root, buffer_writer)
+      root
     end
   
     def process_nodes(nodes, parent_instruction, buffer_writer)
       nodes.each do |node|
         node_instruction = NodeInstruction.new
-        node_instruction.nodetree = node
         parent_instruction.add_child(node_instruction)
         process_node(node, node_instruction, parent_instruction, buffer_writer)
       end
@@ -52,28 +47,19 @@ module Thymeleaf
 
     def process_node(node, node_instruction, parent_instruction, buffer_writer)
       if key_word?(node.name)
-        process_especial_node(node, node_instruction, parent_instruction, buffer_writer)
+        process_html_node(node, node_instruction, parent_instruction, buffer_writer)
       else
-        process_normal_node(node, node_instruction, parent_instruction, buffer_writer)
-      end      
+        process_dialect_node(node, node_instruction, parent_instruction, buffer_writer)
+      end     
     end
   
-    def process_especial_node(node, node_instruction, parent_instruction, buffer_writer)
-      instructions = node_instruction.instructions.especial_instructions
-      case node.name
-      when 'text-content'
-        instructions << Instruction.new(buffer_writer.text_content(node))
-      when 'comment'
-        instructions << Instruction.new(buffer_writer.comment_content(node))
-      when 'doctype'
-        instructions << Instruction.new(buffer_writer.doctype_content(node))
-      when 'meta'
-        instructions << Instruction.new("attributes = #{node.attributes}")
-        instructions << Instruction.new(buffer_writer.meta_content(node))
-      end
+    def process_html_node(node, node_instruction, parent_instruction, buffer_writer)
+      dialects = Thymeleaf.configuration.dialects 
+      key, processor = * dialects.find_html_processor(node.name)
+      process_element(node, node_instruction, parent_instruction, buffer_writer, nil, key, processor)    
     end
   
-    def process_normal_node(node, node_instruction, parent_instruction, buffer_writer)
+    def process_dialect_node(node, node_instruction, parent_instruction, buffer_writer)
       process_attributes(node, node_instruction, parent_instruction, buffer_writer)
       process_tag(node, node_instruction, parent_instruction, buffer_writer)
       process_nodes(node.children, node_instruction, buffer_writer)

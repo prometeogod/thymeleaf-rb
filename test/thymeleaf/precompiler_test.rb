@@ -16,10 +16,12 @@ describe Thymeleaf::Precompiler do
     @remove_template = Thymeleaf::Parser.new('<p data-th-remove="none">Texto<h>child</h></p>').call
     @fragment_template = Thymeleaf::Parser.new('<p data-th-fragment="texto">Texto</p>').call
     @insert_template = Thymeleaf::Parser.new(template_insert).call
+    @replace_template = Thymeleaf::Parser.new(template_replace).call
   end
 
   it 'should be an empty parsed template' do 
-    assert_equal @empty_parsed_template.empty?, true
+    template_function = precompile_function(@empty_parsed_template)
+    assert_equal template_function, template_empty_function
   end
 
   it 'should be a function with begin and end tags' do 
@@ -37,17 +39,17 @@ describe Thymeleaf::Precompiler do
     assert_equal template_function, template_utext_function
   end
 
-  it 'should be a function with begin and end tags and text-content' do 
+  it 'should be a function with begin and end tags and text_content' do 
     template_function = precompile_function(@text_content_template)
     assert_equal template_function, template_text_content_function
   end
 
-  it 'should be a function with if begin and end tags and text-content' do 
+  it 'should be a function with if begin and end tags and text_content' do 
     template_function = precompile_function(@if_template)
     assert_equal template_function, template_if_function
   end
 
-  it 'should be a function with an unless begin and end tags and text-content' do 
+  it 'should be a function with an unless begin and end tags and text_content' do 
     template_function = precompile_function(@unless_template)
     assert_equal template_function, template_unless_function
   end
@@ -85,11 +87,24 @@ describe Thymeleaf::Precompiler do
   it 'should be a function that process fragment and insert this fragment' do 
     template_function = precompile_function(@insert_template)
     assert_equal template_function, template_insert_function
-  end 
+  end
+
+  it 'should be a function that process fragment and replace this fragment' do 
+    template_function = precompile_function(@replace_template)
+    assert_equal template_function, template_replace_function
+  end
+
+
   private
 
   def precompile_function(parsed_template)
     Thymeleaf::Precompiler.new(parsed_template).send(:template_function)
+  end
+
+  def template_empty_function
+    "->(context, writer, formatter){
+}
+"
   end
 
   def function_simple_result
@@ -329,6 +344,40 @@ subtemplate = EvalExpression.parse(context, template)
 writer.write formatter.print_extern_template(subtemplate, context, fragment)
 end
 writer.write '</p>'
+}
+"
+  end
+
+  def template_replace
+'<p data-th-fragment="texto">Texto</p>
+<p data-th-replace="this::texto"></p>'
+  end
+
+  def template_replace_function
+"->(context, writer, formatter){
+fragment_name = EvalExpression.parse(context, 'texto')
+private_var = \"fragment_var_\" + fragment_name
+define_singleton_method(private_var) do 
+attributes = {}
+writer.write '<p' + formatter.attributes_string(attributes) + '>'
+writer.write 'Texto'
+writer.write '</p>'
+end
+eval(private_var)
+writer.write '
+'
+template, fragment = FragmentExpression.parse(context, 'this::texto')
+if (template=='this' || template.nil?)
+unless fragment.nil?
+if fragment.match(/#^*/).nil?
+eval('fragment_var_' + fragment)
+else
+end
+end
+else
+subtemplate = EvalExpression.parse(context, template)
+writer.write formatter.print_extern_template(subtemplate, context, fragment)
+end
 }
 "
   end

@@ -10,7 +10,7 @@ class ExampleDialect < Dialect
     {
       hello: HelloProcessor,
       # default key is required
-      default: Thymeleaf::NullProcessor
+      default: NullProcessor
     }
   end
   # Class HelloProcessor: a test processor
@@ -23,7 +23,7 @@ class ExampleDialect < Dialect
     def call(node: nil, _attribute: nil, **_)
       node.attributes.delete('data-say-hello')
       node.children.clear
-      content = NodeTree.new('text-content', 'Hello')
+      content = NodeTree.new('text_content', 'Hello')
       node.add_child(content)
     end
   end

@@ -1,6 +1,6 @@
 
 def key_words
-  ['text_content', 'comment', 'doctype', 'meta']
+  ['text_content', 'comment', 'doctype', 'meta','root']
 end
 
 def key_word?(word)

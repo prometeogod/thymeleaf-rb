@@ -27,9 +27,7 @@ class Formatter
   def print_extern_template(template_name, context, fragment)
     writer = Writer.new
     template = get_extern_template(template_name)
-    unless fragment.nil?
-      template = find_subfragment(fragment, template)
-    end
+    template = find_subfragment(fragment, template) unless fragment.nil?
     precompiled = Thymeleaf::Precompiler.new(template).precompile
     precompiled.call(context, writer, self)
     writer.output
@@ -43,13 +41,23 @@ class Formatter
     end
   end
 
-  def find_subfragment(fragment_name, nodes, solution = [])
-    nodes.each do |node|
-      unless key_word?(node.name)
-        solution << node if node.attributes.any?{|key,value| key.eql?('data-th-fragment')&& value.eql?(fragment_name)}
-        find_subfragment(fragment_name, node.children, solution) unless node.children.empty?
-      end
-    end
-    solution
+  def find_subfragment(fragment_name, template)
+    nodes = find_subfragment_node(fragment_name, template)
+    root = NodeTree.new('root')
+    root.append(nodes)
   end 
+
+  def find_subfragment_node(fragment_name, node, solution= [])
+    solution << node if subfragment_condition(fragment_name, node.attributes)
+    find_subfragment_children(fragment_name, node.children, solution)
+    solution
+  end
+
+  def find_subfragment_children(fragment_name, nodes, solution)
+    nodes.each { |node| find_subfragment_node(fragment_name, node, solution)}
+  end 
+
+  def subfragment_condition(fragment_name, attributes)
+    attributes.is_a?(Hash) && attributes.any?{|k,v| k.eql?('data-th-fragment')&& v.eql?(fragment_name)}
+  end
 end

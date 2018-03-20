@@ -1,5 +1,6 @@
 require 'oga'
 require_relative 'sax_handler'
+require_relative 'nodetree'
 
 module Thymeleaf
   # Parser of the engine : using Oga
@@ -7,7 +8,14 @@ module Thymeleaf
     def call
       handler = SaxHandler.new
       Oga.sax_parse_html(handler, template_markup)
-      handler.nodes
+      nodes = handler.nodes
+      root_node.append(nodes)
+    end
+
+    private 
+
+    def root_node
+      NodeTree.new('root')
     end
   end
 end
