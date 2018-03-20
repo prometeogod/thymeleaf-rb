@@ -21,8 +21,7 @@ module Thymeleaf
 
     def template_function
       buffer = PrecompileBuffer.new
-      buffer_writer = BufferWriter.new
-      process_template(parsed_template, buffer_writer).to_buffer(buffer)
+      process_template(parsed_template, BufferWriter.new).to_buffer(buffer)
       buffer.flush
     end
   

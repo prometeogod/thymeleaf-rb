@@ -6,7 +6,6 @@ class NodeInstructionAttributes
   end
 
   def empty?
-    return true if simple_attributes.empty? && from_default.empty?
-    false
+    simple_attributes.empty? && from_default.empty?
   end
 end

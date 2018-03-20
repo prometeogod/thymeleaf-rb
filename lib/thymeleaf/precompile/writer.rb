@@ -6,10 +6,6 @@ class Writer
   def write(x)
     buffer << x
   end
-    
-  def <<(x)
-    buffer << x
-  end
 	
   def output
     buffer.join

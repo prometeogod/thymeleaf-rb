@@ -14,10 +14,6 @@ module ThymeleafTest
       @file = file
     end
 
-    def test_path
-      file
-    end
-
     def context?
       !parts.context.nil?
     end

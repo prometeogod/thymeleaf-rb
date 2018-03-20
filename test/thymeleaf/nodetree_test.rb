@@ -11,7 +11,7 @@ describe NodeTree do
     assert_equal @node.name, 'name'
     assert_equal @node.attributes, {}
     assert_equal @node.children, []
-    assert_equal @node.parent, nil
+    assert_nil @node.parent
   end
 
   it 'should add a child' do
@@ -59,12 +59,6 @@ describe NodeTree do
     refute_equal @node, node_clone
   end
 
-  it 'should convert the NodeTree object to Hash object' do
-    assert_equal @node.class, NodeTree
-    hash_node = @node.to_h
-    assert_equal hash_node.class, Hash
-  end
-
   it 'should return a string in html syntax' do
     @node.add_child(@child)
     html_string = @node.to_html
@@ -76,5 +70,7 @@ describe NodeTree do
     assert_equal @node.children.include?(@child), true
     @child.delete
     assert_equal @node.children.include?(@child), false 
-  end 
+  end
+
+
 end

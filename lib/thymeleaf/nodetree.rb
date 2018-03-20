@@ -4,10 +4,11 @@ class NodeTree
   attr_accessor :name, :attributes, :children, :parent
 
   def initialize(name, attributes = {}, children = [], parent = nil)
-    self.name = name
-    self.attributes = attributes
-    self.children = children
-    self.parent = parent
+    @name = name
+    @attributes = attributes
+    @children = children
+    @parent = parent
+    
   end
 
   def delete
@@ -52,48 +53,23 @@ class NodeTree
     Marshal.load(Marshal.dump(self))
   end
 
-  def to_h
-    {
-      name: name,
-      attributes: attributes,
-      children: to_h_children(children)
-    }
-  end
-
   def to_html
     string = ''
     string + (key_word?(name) ? to_html_text(self) : to_html_regular(self))
   end
 
-  def to_s_attr
-    to_s_attributes(self.attributes)
-  end
-
   private
-
-  def to_h_children(children)
-    list = []
-    children.each do |child|
-      hash = {
-        name: child.name,
-        attributes: child.attributes,
-        children: to_h_children(child.children)
-      }
-      list << hash
-    end
-    list
-  end
 
   def to_html_text(node, string = '')
     case node.name
     when 'text_content'
       string << node.attributes
     when 'comment'
-      string << "<!-- #{node.attributes} -->"
+      string << "<!--#{node.attributes}-->"
     when 'doctype'
       string << node.attributes
     when 'meta'
-      string << "< #{node.name} #{to_s_attributes(node.attributes)} />"
+      string << "<#{node.name}#{to_s_attributes(node.attributes)} />"
     when 'root'
       string
     end

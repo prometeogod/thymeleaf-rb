@@ -44,7 +44,8 @@ class DefaultDialect < Dialect
       meta: MetaProcessor,
       comment: CommentProcessor,
       doctype: DoctypeProcessor,
-      text_content: TextContentProcessor
+      text_content: TextContentProcessor,
+      root: RootProcessor
     }
   end
 
@@ -71,4 +72,5 @@ class DefaultDialect < Dialect
   require_relative 'processors/text_content'
   require_relative 'processors/comment'
   require_relative 'processors/doctype'
+  require_relative 'processors/root'
 end

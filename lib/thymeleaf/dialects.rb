@@ -51,7 +51,7 @@ module Thymeleaf
     end
 
     def dialect_html_matchers
-      /^(meta|doctype|text_content|comment)/
+      /^(meta|doctype|text_content|comment|root)/
     end
 
     def null_processor

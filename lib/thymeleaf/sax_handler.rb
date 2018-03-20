@@ -38,14 +38,6 @@ class SaxHandler
     end
   end
 
-  # Returns a html string from the handler
-  def to_html(nodes = @nodes, string = '')
-    nodes.each do |node|
-      string += node.to_html
-    end
-    string
-  end
-
   def on_comment(comment)
     node_comment = NodeTree.new('comment', comment)
     parent = @names.last

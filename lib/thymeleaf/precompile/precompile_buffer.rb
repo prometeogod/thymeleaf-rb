@@ -20,8 +20,7 @@ class PrecompileBuffer
   end
    
   def empty?
-    return true if buffer.empty?
-    false
+    buffer.empty?
   end
 
   private

@@ -28,49 +28,4 @@ class ContextHolder < Struct.new(:context, :parent_context)
       parent_context.root
     end
   end
-
-  def to_s
-    string = '{'
-    context.to_h.each do |key, value|
-      if value.is_a?(Array)
-        string += to_s_child(value)
-      else
-        string += key.to_s + ':' + value.to_s
-      end
-      string += ',' unless context.to_h.to_a.last.last == value
-    end
-    string += '}'
-  end
-
-  private
-
-  def to_s_child(array)
-    string = '['
-    array.each do |element|
-      if element.is_a?(ContextStruct)
-        string += to_s_child_context(element.to_h)
-      elsif element.is_a?(Array)
-        string += to_s_child(element) unless element.nil?
-      else
-        string += element.to_s unless element.nil?
-      end
-      string += ',' unless array.last == element
-    end
-    string += ']'
-    string
-  end
-
-  def to_s_child_context(contextstruct)
-    string = '{'
-    contextstruct.each do |key, value|
-      if value.is_a?(Array)
-        string += key.to_s + ':' + (to_s_child(value) unless value.nil?)
-      else
-        string += key.to_s + ':' + value.to_s
-      end
-      string += ',' unless contextstruct.to_a.last.last == value
-    end
-    string += '}'
-    string
-  end
 end

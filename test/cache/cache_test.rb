@@ -15,7 +15,7 @@ describe Cache do
     assert_equal @cache.count, 0
     @cache.set('string', 'this is a string')
     assert_equal @cache.count, 1
-    assert_equal @cache.limit, nil
+    assert_nil @cache.limit
   end
 
   it 'should return value when you use get with a key' do

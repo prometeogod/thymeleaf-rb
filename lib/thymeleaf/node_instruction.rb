@@ -14,8 +14,7 @@ class NodeInstruction
   end
 
   def empty?
-    return true if instructions.empty?
-    false
+    instructions.empty?
   end
 
   def to_buffer(buffer)
