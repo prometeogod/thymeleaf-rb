@@ -1,11 +1,16 @@
-require_relative '../../../precompile/buffer_writer'
+require_relative '../../../precompile/statement_factory'
 require_relative '../../../../../lib/thymeleaf'
 require_relative '../../../utils/booleanize'
 class IfProcessor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
-    begin_instruction = buffer_writer.if_statement(attribute)
-    end_instruction = buffer_writer.ending
-    node_instruction.instructions.attribute_instructions << Instruction.new(begin_instruction, end_instruction)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
+    node_instruction.instructions.attribute_instructions << if_instruction(statement_factory, attribute)
     node.attributes.delete("data-th-if") 
+  end
+
+  private 
+
+  def if_instruction(statement_factory, attribute)
+  	if_statement, end_statement = statement_factory.if_statement(attribute)
+  	Instruction.new(if_statement, end_statement)
   end
 end

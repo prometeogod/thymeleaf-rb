@@ -1,39 +1,34 @@
+require_relative '../../../utils/statement_to_instruction_converter'
 class ReplaceProcessor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
     node.attributes.delete('data-th-insert')
     node.children.clear
     node.attributes.clear
-    fragment_expresion = Instruction.new("template, fragment = FragmentExpression.parse(context, \'#{attribute}\')")
-    node_instruction.nodetree = node
     node.name = ''
     
     node_instruction.instructions.tag_instructions.clear
     node_instruction.instructions.especial_instructions.clear
     node_instruction.instructions.attribute_instructions.clear
 
-    node_instruction.instructions.attribute_instructions << fragment_expresion
-    
-    fragment_var = DefaultDialect::CONTEXT_FRAGMENT_VAR
-    
-  
-    
-    node_instruction.instructions.attribute_instructions << Instruction.new("if (template==\'this\' || template.nil?)",buffer_writer.ending)
-    node_instruction.instructions.attribute_instructions << Instruction.new("unless fragment.nil?")
-    node_instruction.instructions.attribute_instructions << Instruction.new("if fragment.match(/#^*/).nil?")
-    node_instruction.instructions.attribute_instructions << Instruction.new("eval(\'#{fragment_var}_\' + fragment)")
-    node_instruction.instructions.attribute_instructions << Instruction.new("else")
-    # DOM Replacement
-    node_instruction.instructions.attribute_instructions << Instruction.new("end")
-    node_instruction.instructions.attribute_instructions << Instruction.new("end")
-    node_instruction.instructions.attribute_instructions << Instruction.new("else")
-
-    extern_fragment(node_instruction)
+    attribute_instructions, before_children = replace_instructions(statement_factory, attribute)
+    attribute_instructions.each {|instruction| node_instruction.instructions.attribute_instructions << instruction}
+    before_children.each {|instruction| node_instruction.instructions.before_children << instruction}
     
   end
 
-  def extern_fragment(node_instruction)
-  	node_instruction.instructions.before_children << Instruction.new("subtemplate = EvalExpression.parse(context, template)")
-    node_instruction.instructions.before_children << Instruction.new("writer.write formatter.print_extern_template(subtemplate, context, fragment)")
-    
+  private 
+  
+  def replace_instructions(statement_factory, attribute)
+    fragment_var = DefaultDialect::CONTEXT_FRAGMENT_VAR
+    attribute_statements, before_children = statement_factory.replace_statement(attribute, fragment_var)
+    [attribute_instructions(attribute_statements) ,before_children_instructions(before_children)]
+  end
+
+  def attribute_instructions(statement_list)
+    convert_to_instructions(statement_list)
+  end
+
+  def before_children_instructions(statement_list)
+    convert_to_instructions(statement_list)
   end
 end

@@ -1,11 +1,15 @@
-require_relative '../../../precompile/buffer_writer'
+
 class CaseProcessor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
-    switch_var = DefaultDialect::CONTEXT_SWITCH_VAR
-    case_instruction_begin = buffer_writer.case_statement(attribute, switch_var)
-    case_instruction_end = buffer_writer.ending
-    case_instruction = Instruction.new(case_instruction_begin, case_instruction_end)
-    node_instruction.instructions.attribute_instructions << case_instruction
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
+    node_instruction.instructions.attribute_instructions << case_instruction(statement_factory, attribute)
     node.attributes.delete("data-th-case")
+  end
+
+  private
+  
+  def case_instruction(statement_factory, attribute)
+  	switch_var = DefaultDialect::CONTEXT_SWITCH_VAR
+  	case_statement, end_statement = statement_factory.case_statement(attribute, switch_var)
+  	Instruction.new(case_statement, end_statement)
   end
 end

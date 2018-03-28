@@ -1,7 +1,6 @@
 class DefaultProcessor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
     node.attributes.delete(('data-th-' + key))
-    default_value = "EvalExpression.parse(context, \'#{attribute}\')"
-    node_instruction.attributes.from_default[key] = default_value
+    node_instruction.attributes.from_default[key] = statement_factory.default_statement(attribute)
   end
 end

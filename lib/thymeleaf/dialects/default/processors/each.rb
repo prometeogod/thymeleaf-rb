@@ -1,14 +1,17 @@
 # Processor Each
 class EachProcessor
   include Thymeleaf::Processor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
   	node.attributes.delete('data-th-each')
-  	def_method_each = Instruction.new("def each_method(context, writer, formatter)",buffer_writer.ending)
+    #lambda_each_block = Instruction.new("eval(\%(->(context,writer, formatter){")
+    #lambda_each_block_ending = Instruction.new(nil,"})).call(context,writer, formatter)")
+  	def_method_each = Instruction.new("def each_method(context, writer, formatter)",statement_factory.ending)
   	method_call = Instruction.new(nil,"each_method(context, writer, formatter)")
     each_variables = Instruction.new("variable, stat, enumerable = EachExpression.parse(context, \'#{attribute}\')")
     elements_variable = Instruction.new("elements = ContextEvaluator.new(context).evaluate(enumerable)")
     init_stat_var = Instruction.new("stat_var = formatter.init_stat_var(stat, elements)")
-    each_statement = Instruction.new("elements.each do |element|", buffer_writer.ending)
+    each_statement = Instruction.new("elements.each do |element|")
+    each_statement_ending = Instruction.new(nil, statement_factory.ending)
     subcontext_vars_init =Instruction.new( "subcontext_vars = {}")
     subcontext_vars_set = Instruction.new("subcontext_vars[variable] = element unless variable.nil?")
     node_attributes = Instruction.new ("attributes = #{node.attributes}")
@@ -16,7 +19,7 @@ class EachProcessor
     subcontext_each = Instruction.new("context = ContextHolder.new(subcontext_vars, context)")
 
     node_instruction.instructions.attribute_instructions << def_method_each
-    
+    #node_instruction.instructions.attribute_instructions << lambda_each_block
     node_instruction.instructions.attribute_instructions << each_variables
     
     node_instruction.instructions.attribute_instructions << elements_variable
@@ -32,9 +35,14 @@ class EachProcessor
 
     node_instruction.instructions.attribute_instructions << unless_stat_nil
     update_stat(node_instruction.instructions.attribute_instructions)
-    node_instruction.instructions.attribute_instructions << Instruction.new(buffer_writer.ending)
+    node_instruction.instructions.attribute_instructions << Instruction.new(statement_factory.ending)
     
     node_instruction.instructions.attribute_instructions << subcontext_each
+    
+
+    node_instruction.instructions.attribute_instructions << each_statement_ending
+    #node_instruction.instructions.attribute_instructions << lambda_each_block_ending
+
     node_instruction.instructions.attribute_instructions << method_call
   end
 

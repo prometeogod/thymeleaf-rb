@@ -1,14 +1,16 @@
-require_relative '../../../precompile/buffer_writer'
 require_relative '../../../../../lib/thymeleaf'
 class SwitchProcessor
-  def call(node: nil, node_instruction: nil, parent_instruction: nil, buffer_writer: nil, attribute: nil, key: nil)
-    new_context = "case_context = ContextHolder.new({}, context)"
-    switch_context_instruction = Instruction.new(new_context)
-    switch_var = DefaultDialect::CONTEXT_SWITCH_VAR
-    begin_instruction_switch = buffer_writer.switch_statement(attribute, switch_var)
-    switch_instruction = Instruction.new(begin_instruction_switch)
-    node_instruction.instructions.attribute_instructions << switch_context_instruction 
-    node_instruction.instructions.attribute_instructions << switch_instruction
+  def call(node: nil, node_instruction: nil, parent_instruction: nil, statement_factory: nil, attribute: nil, key: nil)
+    switch_instructions(statement_factory, attribute).each do |instruction|
+      node_instruction.instructions.attribute_instructions << instruction
+    end
     node.attributes.delete("data-th-switch")
+  end
+
+  private 
+
+  def switch_instructions(statement_factory, attribute)
+    switch_statement = statement_factory.switch_statement(attribute, DefaultDialect::CONTEXT_SWITCH_VAR)
+    switch_instructions = switch_statement.map {|statement| Instruction.new(statement)}
   end
 end

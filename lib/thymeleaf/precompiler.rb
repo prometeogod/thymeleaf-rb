@@ -1,5 +1,5 @@
 require_relative 'precompile/precompile_buffer'
-require_relative 'precompile/buffer_writer'
+require_relative 'precompile/statement_factory'
 require_relative '../thymeleaf'
 require_relative 'precompile/writer'
 require_relative 'instructions'
@@ -21,7 +21,7 @@ module Thymeleaf
 
     def template_function
       buffer = PrecompileBuffer.new
-      process_template(parsed_template, BufferWriter.new).to_buffer(buffer)
+      process_template(parsed_template, StatementFactory.new).to_buffer(buffer)
       buffer.flush
     end
   
@@ -29,61 +29,61 @@ module Thymeleaf
       eval(function)
     end
 
-    def process_template(template, buffer_writer)
+    def process_template(template, statement_factory)
       root = NodeInstruction.new
-      process_node(template, root, nil, buffer_writer)
-      process_nodes(template.children, root, buffer_writer)
+      process_node(template, root, nil, statement_factory)
+      process_nodes(template.children, root, statement_factory)
       root
     end
   
-    def process_nodes(nodes, parent_instruction, buffer_writer)
+    def process_nodes(nodes, parent_instruction, statement_factory)
       nodes.each do |node|
         node_instruction = NodeInstruction.new
         parent_instruction.add_child(node_instruction)
-        process_node(node, node_instruction, parent_instruction, buffer_writer)
+        process_node(node, node_instruction, parent_instruction, statement_factory)
       end
     end
 
-    def process_node(node, node_instruction, parent_instruction, buffer_writer)
+    def process_node(node, node_instruction, parent_instruction, statement_factory)
       if key_word?(node.name)
-        process_html_node(node, node_instruction, parent_instruction, buffer_writer)
+        process_html_node(node, node_instruction, parent_instruction, statement_factory)
       else
-        process_dialect_node(node, node_instruction, parent_instruction, buffer_writer)
+        process_dialect_node(node, node_instruction, parent_instruction, statement_factory)
       end     
     end
   
-    def process_html_node(node, node_instruction, parent_instruction, buffer_writer)
+    def process_html_node(node, node_instruction, parent_instruction, statement_factory)
       dialects = Thymeleaf.configuration.dialects 
       key, processor = * dialects.find_html_processor(node.name)
-      process_element(node, node_instruction, parent_instruction, buffer_writer, nil, key, processor)    
+      process_element(node, node_instruction, parent_instruction, statement_factory, nil, key, processor)    
     end
   
-    def process_dialect_node(node, node_instruction, parent_instruction, buffer_writer)
-      process_attributes(node, node_instruction, parent_instruction, buffer_writer)
-      process_tag(node, node_instruction, parent_instruction, buffer_writer)
-      process_nodes(node.children, node_instruction, buffer_writer)
+    def process_dialect_node(node, node_instruction, parent_instruction, statement_factory)
+      process_attributes(node, node_instruction, parent_instruction, statement_factory)
+      process_tag(node, node_instruction, parent_instruction, statement_factory)
+      process_nodes(node.children, node_instruction, statement_factory)
     end
 
-    def process_attributes(node,node_instruction, parent_instruction, buffer_writer)
+    def process_attributes(node,node_instruction, parent_instruction, statement_factory)
       node.attributes.each do |attribute_key, attribute|
-        process_attribute(node, node_instruction, parent_instruction, buffer_writer, attribute_key, attribute)
+        process_attribute(node, node_instruction, parent_instruction, statement_factory, attribute_key, attribute)
       end
     end
 
-    def process_attribute(node, node_instruction, parent_instruction, buffer_writer, attribute_key, attribute)
+    def process_attribute(node, node_instruction, parent_instruction, statement_factory, attribute_key, attribute)
       dialects = Thymeleaf.configuration.dialects
       key, processor = * dialects.find_attr_processor(attribute_key)
-      process_element(node, node_instruction, parent_instruction, buffer_writer, attribute, key, processor)
+      process_element(node, node_instruction, parent_instruction, statement_factory, attribute, key, processor)
     end
   
-    def process_tag(node, node_instruction, parent_instruction, buffer_writer)
+    def process_tag(node, node_instruction, parent_instruction, statement_factory)
       dialects = Thymeleaf.configuration.dialects
       key, processor = * dialects.find_tag_processor(node.name)
-      process_element(node,node_instruction, parent_instruction, buffer_writer, nil, key, processor)
+      process_element(node,node_instruction, parent_instruction, statement_factory, nil, key, processor)
     end
 
-    def process_element(node, node_instruction, parent_instruction, buffer_writer, attribute, key, processor)
-      processor.call(node: node, node_instruction: node_instruction, parent_instruction: parent_instruction, buffer_writer: buffer_writer, attribute: attribute, key: key)
+    def process_element(node, node_instruction, parent_instruction, statement_factory, attribute, key, processor)
+      processor.call(node: node, node_instruction: node_instruction, parent_instruction: parent_instruction, statement_factory: statement_factory, attribute: attribute, key: key)
     end
   end
 end
