@@ -12,6 +12,13 @@ class Instructions
     tag_instructions.empty? && attribute_instructions.empty? && especial_instructions.empty?
   end
 
+  def first_instruction
+    return especial_instructions[0] unless especial_instructions.empty?
+    return attribute_instructions[0] unless attribute_instructions.empty?
+    return tag_instructions[0] unless tag_instructions.empty?
+    return before_children[0] unless before_children.empty?
+  end
+
   def to_buffer_begin(buffer)
   	to_buffer_begin_especial_instructions(buffer)
     to_buffer_begin_attribute_instructions(buffer)

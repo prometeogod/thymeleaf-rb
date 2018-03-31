@@ -62,4 +62,10 @@ describe Instructions do
     @instructions.to_buffer_end(@buffer)
     assert_equal @buffer, [1,2,3,3.5,3.75,4,5,6]
   end     
+
+  it 'should return the first instruction' do
+    @instructions.before_children << Instruction.new('Primera','instruction')
+    @instructions.before_children << Instruction.new('segunda')
+    assert_equal @instructions.first_instruction.join(' '), 'Primera instruction'
+  end
 end

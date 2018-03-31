@@ -19,11 +19,11 @@ class StatementFactory
   end
   
   def end_tag(node)
-    write "\'</#{node.name}>\'"
+    write %('</#{node.name}>')
   end
 
   def text_content(node)
-    write "\'#{node.attributes.to_s}\'"
+    write "%(#{node.attributes.to_s})"
   end
 
   def comment_content(node)
@@ -58,6 +58,11 @@ class StatementFactory
     ""
   end
 
+  def newline_statement
+    write %(%(
+ ))
+  end
+
   def if_statement(attribute)
     ["if booleanize EvalExpression.parse(context, \'#{attribute}\')",ending]
   end
@@ -67,7 +72,7 @@ class StatementFactory
   end
 
   def text_statement(attribute)
-    write "Oga::XML::Entities.encode(EvalExpression.parse(context,\'#{attribute}\'))"
+    write %(Oga::XML::Entities.encode(EvalExpression.parse(context,%(#{attribute}))))
   end
 
   def utext_statement(attribute)

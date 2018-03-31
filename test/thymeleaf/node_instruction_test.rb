@@ -86,6 +86,13 @@ describe NodeInstruction do
     @node.instructions.before_children << Instruction.new(4,5)
     @node.to_buffer(@buffer)
     assert_equal @buffer, [1,2,3,4,5,6,7,8]
-  end 
+  end
+
+  it 'should return the first intruction of the node' do 
+    @node.instructions.especial_instructions << Instruction.new('primera')
+    assert_equal @node.first_instruction, 'primera'
+    @node.instructions.especial_instructions << Instruction.new('segunda')
+    assert_equal @node.first_instruction, 'primera'
+  end
 
 end

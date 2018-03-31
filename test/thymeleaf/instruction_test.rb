@@ -27,5 +27,9 @@ describe Instruction do
     example = Instruction.new('Hello','Good morning')
     assert_equal example.join(' ') , 'Hello Good morning'
   end
-   
+
+  it 'should return an Array with the begin an end of an instruction' do 
+    instruction = Instruction.new(1,2)
+    assert_equal instruction.to_a, [1,2]
+  end 
 end

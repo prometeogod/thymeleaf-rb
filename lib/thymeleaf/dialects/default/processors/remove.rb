@@ -8,7 +8,7 @@ class RemoveProcessor
     end
     node.children.clear
 
-    first_child = node_instruction.children.first
+    first_child = first_non_empty_children(node_instruction, statement_factory)
     instructions = remove_instructions(statement_factory, attribute, node_instruction.children)
     
     instructions[0].each {|instruction| node_instruction.instructions.especial_instructions.unshift(instruction)}
@@ -24,5 +24,11 @@ class RemoveProcessor
   def remove_instructions(statement_factory, attribute, children)
     statements = statement_factory.remove_statement(attribute, children)
     instructions = statements.map {|statement_list| convert_to_instructions(statement_list)}
+  end
+
+  def first_non_empty_children(node_instruction, statement_factory)
+    node_instruction.children.each do |child|
+      return child unless child.first_instruction.squeeze.eql?(statement_factory.newline_statement)
+    end
   end
 end

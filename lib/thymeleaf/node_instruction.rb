@@ -17,6 +17,10 @@ class NodeInstruction
     instructions.empty?
   end
 
+  def first_instruction
+    instructions.first_instruction.to_a[0]
+  end
+
   def to_buffer(buffer)
     instructions.to_buffer_begin(buffer)
     instructions.to_buffer_before_children(buffer)
