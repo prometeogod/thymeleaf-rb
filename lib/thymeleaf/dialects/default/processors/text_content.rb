@@ -6,6 +6,6 @@ class TextContentProcessor
   private
 
   def text_content_instruction(statement_factory, node)
-    Instruction.new(statement_factory.text_content(node))
+    Instruction.new(statement_factory.text_content_statement(node))
   end
 end

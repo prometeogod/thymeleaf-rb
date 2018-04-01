@@ -33,10 +33,6 @@
     <div data-th-replace="content::subcontent">
         <p> The included subcontent</p>
     </div>
-    <!-- DOM Replacement -->
-    <div data-th-replace="::#another-fragment">
-        <p> The included subcontent</p>
-    </div>
 </article>
 ---
 <article>
@@ -54,11 +50,9 @@
     <!-- Same as previous, short form -->
     <header>This is my fragment</header>
     <!-- Invalid replacement -->
-    <div></div>
+    
     <!-- Selecting a specific part of external page -->
     <p>Included content!</p>
-    <!-- DOM Replacement -->
-    <header id="another-fragment">This is another fragment</header>
 </article>
 ---
 <article>
